@@ -50,9 +50,17 @@ cd ~/spot_ws
 colcon build --symlink-install
 source install/setup.bash
 
-# Launch the RViz display
-First terminal run: ros2 launch microspot_description display.launch.py
-Second terminal run: ros2 run spot_controller walking_gait
+# Launch the RViz display & controller
+# Terminal 1:
+ros2 launch microspot_description display.launch.py
 
-# Launch gazebo
-In a third therminal run: ros2 launch spot_bringup spot.launch.py
+# Terminal 2:
+cd ~/spot_ws
+source install/setup.bash
+ros2 run spot_controller walking_gait
+
+# Launch Gazebo Simulation
+# Terminal 3:
+cd ~/spot_ws
+source install/setup.bash
+ros2 launch spot_bringup spot.launch.py
