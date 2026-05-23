@@ -1,0 +1,616 @@
+<?xml version="1.0"?>
+
+<robot name="my_robot">
+
+    <material name="green">
+        <color rgba="0 0.6 0 1" />
+    </material>
+
+    <!-- DUMMY LINK -->
+
+    <link name="world_link">
+    </link>
+
+    <link name="base_link">
+        <visual>
+            <geometry>
+               <box size="0.15 0.12 0.04" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+               <box size="0.15 0.12 0.04" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+
+        <!-- Inertia calculated based on perfect rectangle -->
+        <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        
+        <mass value="0.1"/>
+        
+        <inertia ixx="0.0003333" ixy="0.0"       ixz="0.0" 
+                                iyy="0.0004979" iyz="0.0" 
+                                                izz="0.0007688"/>
+    </inertial>
+    </link>
+
+    <joint name="base" type="fixed">
+        <parent link="world_link" />
+        <child link="base_link" />
+        <origin xyz="0 0 0.1" rpy="0 0 0" />
+    </joint>
+
+    <!-- FRONT RIGHT LEG -->
+
+    <link name="front_right_hip">
+        <visual>
+            <geometry>
+                <box size="0.04 0.06 0.05"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="gray" />
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.04 0.06 0.05"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="-0.00398 0.00085 -0.00004" rpy="0 0 0"/>
+            <mass value="0.02721"/>
+            <inertia ixx="0.00001383" ixy="0.0" ixz="0.0" 
+                                      iyy="0.00000930" iyz="0.0" 
+                                                      izz="0.00001179"/>
+        </inertial>
+    </link>
+
+    <link name="front_right_thigh">
+        <visual>
+            <geometry>
+               <box size="0.13 0.03 0.02" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.13 0.03 0.02" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.0578"/>
+            <inertia ixx="0.00000626" ixy="0.0" ixz="0.0" 
+                                      iyy="0.0000833" iyz="0.0" 
+                                                      izz="0.0000854"/>
+        </inertial>
+    </link>
+
+    <joint name="front_right_hip_joint" type="revolute">
+        <parent link="base_link" />
+        <child link="front_right_hip" />
+        <origin xyz="0.095 -0.05 0" rpy="0 0 0" />
+        <axis xyz="-1 0  0"/>
+        <limit lower="-1.4" upper="1.05" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <joint name="front_right_thigh_joint" type="revolute">
+        <parent link="front_right_hip" />
+        <child link="front_right_thigh" />
+        <origin xyz="0 -0.045 0" rpy="0 1.57 0" />
+        <axis xyz="0 -1  0"/>
+        <limit lower="-1.57" upper="1.57" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <link name="front_right_knee">
+        <visual>
+            <geometry>
+               <box size="0.13 0.015 0.015" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.13 0.015 0.015" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.03019"/>
+            <inertia ixx="0.00000113" ixy="0.0" ixz="0.0" 
+                                      iyy="0.00004308" iyz="0.0" 
+                                                      izz="0.00004308"/>
+        </inertial>
+    </link>
+
+    <joint name="front_right_knee_joint" type="revolute">
+        <parent link="front_right_thigh" />
+        <child link="front_right_knee" />
+        <origin xyz="0.13 0 0" rpy="0 0 0" />
+        <axis xyz="0 -1  0"/>
+        <limit lower="0" upper="2.61799" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <link name="front_right_feet">
+    </link>
+
+    <joint name="front_right_feet_joint" type="fixed">
+        <parent link="front_right_knee" />
+        <child link="front_right_feet" />
+        <origin xyz="0.13 0 0" rpy="0 -1.57 0" />
+    </joint>
+    <gazebo reference="front_right_feet"> <mu1>1.5</mu1> <mu2>1.5</mu2> </gazebo>
+    <!-- BACK RIGHT LEG -->
+
+
+    <link name="back_right_hip">
+        <visual>
+            <geometry>
+                <box size="0.04 0.06 0.05"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="gray" />
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.04 0.06 0.05"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="-0.00398 0.00085 -0.00004" rpy="0 0 0"/>
+            <mass value="0.02721"/>
+            <inertia ixx="0.00001383" ixy="0.0" ixz="0.0" 
+                                      iyy="0.00000930" iyz="0.0" 
+                                                      izz="0.00001179"/>
+        </inertial>
+    </link>
+
+    <link name="back_right_thigh">
+        <visual>
+            <geometry>
+               <box size="0.13 0.03 0.02" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.13 0.03 0.02" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.0578"/>
+            <inertia ixx="0.00000626" ixy="0.0" ixz="0.0" 
+                                      iyy="0.0000833" iyz="0.0" 
+                                                      izz="0.0000854"/>
+        </inertial>
+    </link>
+
+    <joint name="back_right_hip_joint" type="revolute">
+        <parent link="base_link" />
+        <child link="back_right_hip" />
+        <origin xyz="-0.095 -0.05 0" rpy="0 0 0" />
+        <axis xyz="-1 0  0"/>
+        <limit lower="-1.4" upper="1.05" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <joint name="back_right_thigh_joint" type="revolute">
+        <parent link="back_right_hip" />
+        <child link="back_right_thigh" />
+        <origin xyz="0 -0.045 0" rpy="0 1.57 0" />
+        <axis xyz="0 -1  0"/>
+        <limit lower="-1.57" upper="1.57" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <link name="back_right_knee">
+        <visual>
+            <geometry>
+               <box size="0.13 0.015 0.015" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.13 0.015 0.015" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.03019"/>
+            <inertia ixx="0.00000113" ixy="0.0" ixz="0.0" 
+                                      iyy="0.00004308" iyz="0.0" 
+                                                      izz="0.00004308"/>
+        </inertial>
+    </link>
+
+    <joint name="back_right_knee_joint" type="revolute">
+        <parent link="back_right_thigh" />
+        <child link="back_right_knee" />
+        <origin xyz="0.13 0 0" rpy="0 0 0" />
+        <axis xyz="0 -1  0"/>
+        <limit lower="0" upper="2.61799" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <link name="back_right_feet">
+    </link>
+
+    <joint name="back_right_feet_joint" type="fixed">
+        <parent link="back_right_knee" />
+        <child link="back_right_feet" />
+        <origin xyz="0.13 0 0" rpy="0 -1.57 0" />
+    </joint>
+    <gazebo reference="back_right_feet"> <mu1>1.5</mu1> <mu2>1.5</mu2> </gazebo>
+    <!-- BACK LEFT LEG -->
+
+    <link name="back_left_hip">
+        <visual>
+            <geometry>
+                <box size="0.04 0.06 0.05"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="gray" />
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.04 0.06 0.05"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="-0.00398 0.00085 -0.00004" rpy="0 0 0"/>
+            <mass value="0.02721"/>
+            <inertia ixx="0.00001383" ixy="0.0" ixz="0.0" 
+                                      iyy="0.00000930" iyz="0.0" 
+                                                      izz="0.00001179"/>
+        </inertial>
+    </link>
+
+    <link name="back_left_thigh">
+        <visual>
+            <geometry>
+               <box size="0.13 0.03 0.02" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.13 0.03 0.02" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.0578"/>
+            <inertia ixx="0.00000626" ixy="0.0" ixz="0.0" 
+                                      iyy="0.0000833" iyz="0.0" 
+                                                      izz="0.0000854"/>
+        </inertial>
+    </link>
+
+    <joint name="back_left_hip_joint" type="revolute">
+        <parent link="base_link" />
+        <child link="back_left_hip" />
+        <origin xyz="-0.095 0.05 0" rpy="0 0 0" />
+        <axis xyz="-1 0  0"/>
+        <limit lower="-1.4" upper="1.05" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <joint name="back_left_thigh_joint" type="revolute">
+        <parent link="back_left_hip" />
+        <child link="back_left_thigh" />
+        <origin xyz="0 0.045 0" rpy="0 1.57 0" />
+        <axis xyz="0 -1  0"/>
+        <limit lower="-1.57" upper="1.57" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <link name="back_left_knee">
+        <visual>
+            <geometry>
+               <box size="0.13 0.015 0.015" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.13 0.015 0.015" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.03019"/>
+            <inertia ixx="0.00000113" ixy="0.0" ixz="0.0" 
+                                      iyy="0.00004308" iyz="0.0" 
+                                                      izz="0.00004308"/>
+        </inertial>
+    </link>
+
+    <joint name="back_left_knee_joint" type="revolute">
+        <parent link="back_left_thigh" />
+        <child link="back_left_knee" />
+        <origin xyz="0.13 0 0" rpy="0 0 0" />
+        <axis xyz="0 -1  0"/>
+        <limit lower="0" upper="2.61799" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <link name="back_left_feet">
+    </link>
+
+    <joint name="back_left_feet_joint" type="fixed">
+        <parent link="back_left_knee" />
+        <child link="back_left_feet" />
+        <origin xyz="0.13 0 0" rpy="0 -1.57 0" />
+    </joint>
+
+    <gazebo reference="back_left_feet"> <mu1>1.5</mu1> <mu2>1.5</mu2> </gazebo>
+    <!-- FRONT LEFT LEG -->
+
+
+    <link name="front_left_hip">
+        <visual>
+            <geometry>
+                <box size="0.04 0.06 0.05"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="gray" />
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.04 0.06 0.05"/>
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="-0.00398 0.00085 -0.00004" rpy="0 0 0"/>
+            <mass value="0.02721"/>
+            <inertia ixx="0.00001383" ixy="0.0" ixz="0.0" 
+                                      iyy="0.00000930" iyz="0.0" 
+                                                      izz="0.00001179"/>
+        </inertial>
+    </link>
+
+    <link name="front_left_thigh">
+        <visual>
+            <geometry>
+               <box size="0.13 0.03 0.02" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.13 0.03 0.02" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.0578"/>
+            <inertia ixx="0.00000626" ixy="0.0" ixz="0.0" 
+                                      iyy="0.0000833" iyz="0.0" 
+                                                      izz="0.0000854"/>
+        </inertial>
+    </link>
+
+    <joint name="front_left_hip_joint" type="revolute">
+        <parent link="base_link" />
+        <child link="front_left_hip" />
+        <origin xyz="0.095 0.05 0" rpy="0 0 0" />
+        <axis xyz="-1 0  0"/>
+        <limit lower="-1.4" upper="1.05" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <joint name="front_left_thigh_joint" type="revolute">
+        <parent link="front_left_hip" />
+        <child link="front_left_thigh" />
+        <origin xyz="0 0.045 0" rpy="0 1.57 0" />
+        <axis xyz="0 -1  0"/>
+        <limit lower="-1.57" upper="1.57" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <link name="front_left_knee">
+        <visual>
+            <geometry>
+               <box size="0.13 0.015 0.015" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.13 0.015 0.015" />
+            </geometry>
+            <origin xyz="0.05 0 0" rpy="0 0 0" />
+        </collision>
+
+        <inertial>
+            <origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+            <mass value="0.03019"/>
+            <inertia ixx="0.00000113" ixy="0.0" ixz="0.0" 
+                                      iyy="0.00004308" iyz="0.0" 
+                                                      izz="0.00004308"/>
+        </inertial>
+    </link>
+
+    <joint name="front_left_knee_joint" type="revolute">
+        <parent link="front_left_thigh" />
+        <child link="front_left_knee" />
+        <origin xyz="0.13 0 0" rpy="0 0 0" />
+        <axis xyz="0 -1  0"/>
+        <limit lower="0" upper="2.61799" velocity="7.48" effort="2.55"/>
+    </joint>
+
+    <link name="front_left_feet">
+    </link>
+
+    <joint name="front_left_feet_joint" type="fixed">
+        <parent link="front_left_knee" />
+        <child link="front_left_feet" />
+        <origin xyz="0.13 0 0" rpy="0 -1.57 0" />
+    </joint>
+
+    <gazebo reference="front_left_feet"> <mu1>1.5</mu1> <mu2>1.5</mu2> </gazebo>
+
+
+    <ros2_control name="MicroSpotHardwareInterface" type="system">
+        <hardware>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+        
+        <joint name="front_right_hip_joint">
+            <command_interface name="position">
+                <param name="min">-1.4</param>
+                <param name="max">1.05</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="front_right_thigh_joint">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="front_right_knee_joint">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">2.62</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="back_right_hip_joint">
+            <command_interface name="position">
+                <param name="min">-1.4</param>
+                <param name="max">1.05</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="back_right_thigh_joint">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="back_right_knee_joint">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">2.62</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="back_left_hip_joint">
+            <command_interface name="position">
+                <param name="min">-1.4</param>
+                <param name="max">1.05</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="back_left_thigh_joint">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="back_left_knee_joint">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">2.62</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        
+        <joint name="front_left_hip_joint">
+            <command_interface name="position">
+                <param name="min">-1.04</param>
+                <param name="max">1.05</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="front_left_thigh_joint">
+            <command_interface name="position">
+                <param name="min">-1.57</param>
+                <param name="max">1.57</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="front_left_knee_joint">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">2.62</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+    </ros2_control>
+
+    <gazebo>
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <parameters>/home/hakim/Stage_allemagne/spot_ws/src/spot_bringup/config/microspot_controllers.yaml</parameters>
+            
+            <controller_manager_name>controller_manager</controller_manager_name>
+        </plugin>
+    </gazebo>
+</robot>
+
