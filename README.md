@@ -14,9 +14,11 @@ I've been working on this for about a month. The core walking mechanics and hard
 Right now, the robot can calculate its own leg trajectories and move physical motors to match. Here is what is up and running:
 
 * **Simulation & Physics:** Built a custom URDF model for Gazebo/RViz. 
-[MicroSpot Walking Test in Rviz](assets/spot_rviz_sim.gif)
 
-[MicroSpot Walking Test in Gazebo](assets/spot_gazebo_sim.gif)
+  ![MicroSpot Walking Test in Rviz](assets/spot_rviz_sim.gif)
+  
+  ![MicroSpot Walking Test in Gazebo](assets/spot_gazebo_sim.gif)
+
 * **Inverse Kinematics (IK):** Wrote a custom Python solver (`leg_ik_solver.py`) that takes 3D target coordinates and calculates the exact joint angles needed for the hip, thigh, and knee using law of cosines and some basic trigonometry.
 * **Hardware Bridge:** Created a custom ROS 2 node that listens to the calculated joint angles and translates them into actual PWM signals for the physical servos via an I2C board. It handles all the mechanical zero-offsets and mirrored motor directions.
 
