@@ -162,10 +162,10 @@ class MicroSpotManualController(Node):
             msg.name = self.joint_names
 
             msg.position = [
-                fr_h, fr_t, fr_k,   # Front Right Leg
-                br_h, br_t, br_k,   # Back Right Leg
-                bl_h, bl_t, bl_k,   # Back Left Leg
-                fl_h, fl_t, fl_k    # Front Left Leg
+                fr_h, fr_t, fr_k,   
+                br_h, br_t, br_k,   
+                bl_h, bl_t, bl_k,   
+                fl_h, fl_t, fl_k    
             ]
 
             self.joint_pub.publish(msg)

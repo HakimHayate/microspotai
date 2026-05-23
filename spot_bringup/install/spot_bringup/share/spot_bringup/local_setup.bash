@@ -1,1 +1,0 @@
-/home/hakim/Stage_allemagne/spot_ws/src/spot_bringup/build/spot_bringup/ament_cmake_environment_hooks/local_setup.bash

@@ -3,10 +3,9 @@
 <package format="3">
   <name>spot_bringup</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Display the simulation in Gazebo</description>
   <maintainer email="hakimhayate@gmail.com">hakim</maintainer>
-  <license>TODO: License declaration</license>
-
+  <license>Apache-2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
   
   <exec_depend>my_robot_description</exec_depend>

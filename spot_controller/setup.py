@@ -15,8 +15,6 @@ setup(
     zip_safe=True,
     maintainer='hakim',
     maintainer_email='hakimhayate@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
     extras_require={
         'test': [
             'pytest',

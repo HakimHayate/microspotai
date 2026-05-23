@@ -16,12 +16,16 @@ class LegIKSolver:
         Units are in meters and output radians.
         """
         d = math.sqrt(x**2 + z**2)
+
         gamma = math.acos((self.l1**2 + self.l2**2 - d**2)/(2 * self.l1 * self.l2))
         beta = -math.acos((self.l1**2 + d**2 - self.l2**2)/(2 * self.l1 * d))
+
         alpha = math.atan2(z, x)
+
         theta_thigh = alpha + beta
         theta_knee = math.pi - gamma
 
+        # Hip stays horizontal while just the thigh and the knee move
         return 0, theta_thigh, theta_knee 
 
 

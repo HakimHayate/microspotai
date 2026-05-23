@@ -3,10 +3,9 @@
 <package format="3">
   <name>microspot_description</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Visualize a representation of the robot in rviz</description>
   <maintainer email="hakimhayate@gmail.com">hakim</maintainer>
-  <license>TODO: License declaration</license>
-
+  <license>Apache-2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <exec_depend>robot_state_publisher</exec_depend>

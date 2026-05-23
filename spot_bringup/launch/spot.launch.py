@@ -5,18 +5,23 @@ from ament_index_python.packages import get_package_share_path
 from launch.actions import IncludeLaunchDescription, RegisterEventHandler
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.event_handlers import OnProcessExit
+from launch.actions import SetEnvironmentVariable
 
 
 def generate_launch_description():
-    urdf_path = os.path.join(get_package_share_path('microspot_description'),
-                            'urdf',
-                            'microspot.urdf')
-    
+    spot_bringup_share = get_package_share_path('spot_bringup')
+    microspot_description_share = get_package_share_path('microspot_description')
     ros_gz_sim_dir = get_package_share_path('ros_gz_sim')
 
-    robot_desc = None
+    yaml_controllers_path = os.path.join(spot_bringup_share, 'config', 'microspot_controllers.yaml')
+    urdf_path = os.path.join(microspot_description_share, 'urdf', 'microspot.urdf')
+    
+    # Read the raw URDF text
     with open(urdf_path, 'r') as f:
-        robot_desc = f.read()
+        raw_robot_desc = f.read()
+    
+    # Inject the absolute path directly into the URDF text 
+    robot_desc = raw_robot_desc.replace('MICROSPOT_YAML_PATH_PLACEHOLDER', str(yaml_controllers_path))
     
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
