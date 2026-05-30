@@ -36,18 +36,17 @@ I am transitioning this from a blind walking robot into something that can map a
 If you want to poke around the math and see the RViz simulation:
 
 ```bash
-# Create a new directory 
-mkdir ~/spot_ws
-cd ~/spot_ws
+mkdir -p ~/spot_ws/src
+cd ~/spot_ws/src
 
-# Clone the repo
-git clone [https://github.com/HakimHayate/microspotai.git](https://github.com/HakimHayate/microspotai.git)
-mv microspotai/* .
-rm -rf microspotai
+# 3. Clone the repo directly into the src folder
+git clone https://github.com/HakimHayate/microspotai.git
 
-# Build the workspace
+# 4. Build the workspace
 cd ~/spot_ws
 colcon build --symlink-install
+
+# 5. Source the newly built workspace
 source install/setup.bash
 
 # Launch the RViz display & controller
