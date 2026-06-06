@@ -8,7 +8,7 @@ from utils import icp_version2
 import threading
 import queue
 import time
-from clean_icp import icp_2 as clean_icp
+from clean_icp import icp as clean_icp
 
 data_queue = queue.Queue(maxsize=1000)
 

@@ -45,33 +45,9 @@ def toHomogeneous(points):
     pts_h[:,:-1] = points
     return pts_h
 
+
+
 def icp(src, dst, max_interation=50, tol=1e-3):
-    tree = Tree(dst)
-    tree.build_tree()
-
-    error = np.inf
-
-    T_dst_src = np.eye(src.shape[1]+1)
-
-    for _ in range(max_interation):
-        src_match, dst_match = tree.match(src)
-
-        T = transform(src_match, dst_match)
-        T_dst_src = T @ T_dst_src 
-
-        src_h = toHomogeneous(src)
-        src_h = (T @ src_h.T).T
-        src = src_h[:, :-1]
-
-        error = np.sqrt(((dst_match - src_match)**2).sum(axis=1)).mean(axis=0)
-
-        if error < tol:
-            break
-    
-    return T_dst_src
-
-
-def icp_2(src, dst, max_interation=50, tol=1e-3):
     tree = Tree(dst)
     tree.build_tree()
     error = np.inf
