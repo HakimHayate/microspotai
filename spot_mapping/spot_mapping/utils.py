@@ -94,138 +94,56 @@ def match_version2(tree, new_points):
         distances.append(distance)
     
     return np.array(matching_points_source).reshape(-1, 2), np.array(matching_points_destiny).reshape(-1, 2), distances # returns array N x 2
-        
 
-def icp_version2(pts_source, pts_destiny): 
-    pts_source_mean = pts_source.mean(axis=0).reshape(-1, 1)
-    pts_destiny_mean = pts_destiny.mean(axis=0).reshape(-1, 1)
 
-    w = min(pts_source.shape[0], pts_destiny.shape[0])
+def raycaster(p_start, p_end, max_iterations=100):
+    '''
+    Bresenham's line algorithm, takes 2 points in a grid and give the path that connects them.
 
-    W = np.zeros((2, 2))
-    for i in range(w):
-        W += (pts_source[i, :].reshape(-1, 1) - pts_source_mean) @ (pts_destiny[i, :].reshape(-1, 1) - pts_destiny_mean).T
+    Parameters
+        p_start : sequence[int]
+            Starting grid coordinate (x, y).
 
-    U, D, Vt = np.linalg.svd(W)
+        p_end : sequence[int]
+            Ending grid coordinate (x, y).
 
-    S = np.array([
-        [1, 0],
-        [0,  np.linalg.det(U) * np.linalg.det(Vt)] # Make sure it minimizes the error while keeping det(C) = 1
-    ]) 
+    Returns
+        list[tuple[int, int]]
+            Ordered list of grid coordinates from p_start to p_end
+    '''
+    x_robot, y_robot, x_hit, y_hit = p_start[0], p_start[1], p_end[0], p_end[1]
+    dx = abs(x_hit - x_robot)
+    dy = abs(y_hit - y_robot)
 
-    C = Vt.T @ S @ U.T
+    sx = -1 if x_hit - x_robot < 0 else 1
+    sy = -1 if y_hit - y_robot < 0 else 1
 
-    r = pts_destiny_mean - C @ pts_source_mean
-    T = np.array([
-            [C[0,0], C[0,1], r[0, 0]],
-            [C[1,0], C[1,1], r[1, 0]],
-            [0, 0, 1]
-        ])
-    return T, r # C.T : rotation from destiny frame to source frame, r : translation from destiny frame to source in source frame
+    current_x, current_y = x_robot, y_robot
 
-def full_icp(pts_source, pts_destiny, tol=0.00001, max_iteration=50):
-    tree = Tree(pts_source)
-    tree.build_tree()
+    path = [(current_x, current_y)]
+    e = dx - dy
 
-    prev_error = 0 
-    T_base_current = np.eye(3)
-    for _ in range(max_iteration):
-        matched_pts_source, matched_pts_destiny = match_version1(pts_source, pts_destiny) # N x 2 
-        C, r = icp_version2(matched_pts_source, matched_pts_destiny)
-        
-        T_delta = np.array([
-            [C[0,0], C[0,1], r[0, 0]],
-            [C[1,0], C[1,1], r[1, 0]],
-            [0, 0, 1]
-        ])
-        T_base_current = T_base_current @ T_delta
-        
-        transformed = np.zeros(pts_destiny.shape) # N x 2
-        
-        for i in range(len(transformed)):
-            transformed[i, :] = (C @ pts_destiny[i].reshape(-1, 1) + r).T
-
-        error = np.mean(np.linalg.norm(
-            matched_pts_source - matched_pts_destiny,
-            axis=1
-        ))
-        if np.abs(error - prev_error) < tol:
+    for i in range(max_iterations):
+        if (current_x, current_y) == (x_hit, y_hit):
             break
-        
-        pts_destiny = transformed
-        prev_error = error
-    
-    return T_base_current, C
-        
-    
+        tmp = e
+        if tmp <= dx:
+            current_y += sy
+            e += 2 *dx
+            
+        if tmp >= -dy:
+            current_x += sx
+            e -= 2 * dy 
 
-# A quick test for lidar and the icp
-from rplidar import RPLidar
-import matplotlib.pyplot as plt
-import numpy as np
-from nearestNeighbor import Tree
+        path.append((current_x, current_y))
+    return path
 
-min_scans = 100
 def main():
-    global_map = []
-    PORT_NAME = "COM6"
-    T_world_lidar = np.eye(3)
-    lidar = RPLidar(PORT_NAME, timeout=3, baudrate=256000)
-    plt.ion()
-    fig, ax = plt.subplots()
-    initialized = False
-    tree = None
-    prev_pts = None
-    all_pts= []
-    i = 0
-    for scan in lidar.iter_scans():
-        all_pts.append(polar_to_cartezian(scan))
+    p_start = (0, 0)
+    p_end = (3, 4)
+    path = raycaster(p_start, p_end)
 
-
-        current_pts = np.vstack(all_pts)
-        all_pts = []
-        i = 0
-        if not initialized:
-            tree = Tree(current_pts)
-            tree.build_tree() 
-            prev_pts = current_pts
-            global_map.append(polar_to_cartezian(scan))
-            initialized = True
-            continue
-
-        pts_current_h = np.hstack((current_pts, np.ones((current_pts.shape[0], 1))))
-        map = np.array(np.vstack(global_map)).reshape(-1, 2)
-        T_prev_current, C = full_icp(map, current_pts)
-        T_world_lidar = T_world_lidar @ T_prev_current
-        transformed = (T_world_lidar @ pts_current_h.T).T
-        transformed = transformed[:, :-1]
-        theta = math.atan2(T_world_lidar[1,0], T_world_lidar[0,0])
-        print(f'theta = {math.degrees(theta)}')
-
-        global_map.append(transformed)
-        
-        if transformed is None:
-            continue
-        ax.cla()
-        
-        ax.set_aspect('equal')
-        ax.set_xlim(-5000, 5000)
-        ax.set_ylim(-500, 5000)
-        plt.scatter(map[:,0], map[:,1], c='green', s=1, label='map')
-
-        # plt.scatter(current_pts[:,0], current_pts[:,1], c='red', s=1, label='current')
-        # plt.scatter(prev_pts[:,0], prev_pts[:,1], c='black', s=1, label='prev')
-
-        plt.scatter([1000.0], [0.0], c='r', s=1.5)
-        plt.scatter([0.0], [1000.0], c='b', s=1.5)
-        plt.scatter([0.0], [0.0], c='black', s=1)
-        plt.legend()
-        plt.draw()
-        plt.pause(0.1)
-        time.sleep(5)
-
-        prev_pts = current_pts
-
+    print(path)
 
 if __name__ == '__main__':
     main()
