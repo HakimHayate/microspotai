@@ -42,18 +42,18 @@ class RealRobotHardwareBridge(Node):
 
             # FRONT LEFT (LF)
             'front_left_hip_joint': 85,
-            'front_left_thigh_joint': 100,
+            'front_left_thigh_joint': 97,
             'front_left_knee_joint': 180,
 
             # BACK LEFT (BL)
-            'back_left_hip_joint': 90,
-            'back_left_thigh_joint': 80,
-            'back_left_knee_joint': 170,
+            'back_left_hip_joint': 85,
+            'back_left_thigh_joint': 85,
+            'back_left_knee_joint': 185,
 
             # BACK RIGHT (BR)
             'back_right_hip_joint': 90,
             'back_right_thigh_joint': 95,
-            'back_right_knee_joint': -15
+            'back_right_knee_joint': -12
         }
 
         self.direction = {
@@ -103,7 +103,7 @@ class RealRobotHardwareBridge(Node):
                 servo_degree = self.direction[joint_name] *  math.degrees(radian_angle) + self.joint_offsets[joint_name]
                 servo_degree = max(0.0, min(180, servo_degree))
                 
-                # Push directly down the physical I2C wire to the motor
+                # Send angle to pca
                 self.kit.servo[channel].angle = servo_degree
 
 def main(args=None):
