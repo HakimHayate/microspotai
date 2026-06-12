@@ -1,6 +1,6 @@
 from std_msgs.msg import Float64MultiArray
 import math
-from leg_ik_solver import LegIKSolver
+from spot_controller.leg_ik_solver import LegIKSolver
 from sensor_msgs.msg import JointState
 import numpy as np
 

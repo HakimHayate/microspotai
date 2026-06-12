@@ -22,7 +22,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'walking_gait=spot_controller.walking_gait:main',
+            'controller_node=spot_controller.controller_node:main',
             'real_robot_hardware_bridge=spot_controller.real_robot_hardware_bridge:main'
         ],
     },

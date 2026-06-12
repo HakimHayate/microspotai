@@ -3,8 +3,8 @@ from rclpy.node import Node
 import threading
 import tkinter as tk
 from tf2_ros import Buffer, TransformListener
-from body_controller import BodyController
-from gait_controller import GaitController
+from spot_controller.body_controller import BodyController
+from spot_controller.gait_controller import GaitController
 from sensor_msgs.msg import JointState
 import numpy as np
 from std_msgs.msg import Float64MultiArray
