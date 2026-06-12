@@ -24,9 +24,10 @@ class BodyController():
         self.time_elapsed_ = 0.0
         self.dt_ = dt
 
-        self.reached_target_ = False
+        self.reached_target_ = True
         self.initialized_ = False # Initiate feet coordinates
 
+        self.thigh_foot_ = None
         self.T_world_base_ = np.eye(4)
         self.T_world_base_[2, -1] = defaultZ
 
@@ -34,10 +35,10 @@ class BodyController():
         self.T_world_thigh_initial_= {}
         self.T_target_ = np.eye(4)
 
-        self.S_ = np.zeros((3,3))
+        self.S_ = None
 
     def getT(self):
-        return self.T_world_base_
+        return self.T_world_base_, self.thigh_foot_
     
     def restart(self):
         self.time_elapsed_ = 0
@@ -46,7 +47,7 @@ class BodyController():
         '''
         Bring the robot to the default pose
         '''
-        self.T_world_base_ = T_world_base if T_world_base is not None else self.T_world_base_
+        self.T_world_base_ = T_world_base if T_world_base is not None else self.T_world_base_ # If another program changed chassis position, I update here
         self.T_target_ = T_target
         
         self.S_ = get_twist(self.T_world_base_, self.T_target_, t=self.duration_)
@@ -135,7 +136,7 @@ class BodyController():
         
     def body_pose(self):
         command_msg = JointState()       
-
+        gazebo_msg = Float64MultiArray()
         if not self.initialized_:
             try:
                 for link in self.links_:
@@ -151,14 +152,14 @@ class BodyController():
                 command_msg.header.stamp = self.controller_node_.get_clock().now().to_msg()
                 command_msg.name = self.joints_names_
                 command_msg.position = [0] * 12
-
-                return command_msg
+                
+                
+                return command_msg, None
             
         if self.time_elapsed_>= self.duration_: # Robot reached target pose
             self.reached_target_ = True
-        else:
+        elif not self.reached_target_:
             self.time_elapsed_ += self.dt_
-
             # Robot moves slighly each frame to make a smooth movement
             self.T_world_base_ = update_pos(self.T_world_base_, self.S_, dt=self.dt_)
 
@@ -167,18 +168,17 @@ class BodyController():
         for i, link in enumerate(self.links_):
             try:
                 T_world_thigh_current = self.T_world_base_ @ self.T_world_thigh_initial_[link] # Move thighs coordiantes to new coordinates
-                
                 T_thigh_world = np.linalg.inv(T_world_thigh_current)
 
                 T_thigh_foot = T_thigh_world @ self.T_world_foot_[link] # Foot coordinates in thigh frame
                 
-                thigh_foot = (T_thigh_foot[:-1, -1]).flatten()
+                self.thigh_foot_ = (T_thigh_foot[:-1, -1]).flatten()
                 
                 idx = i * 3
                 command[idx], command[idx+1], command[idx+2] = self.solver_.solve(
-                                                                    thigh_foot[0], 
-                                                                    thigh_foot[1], 
-                                                                    thigh_foot[2]
+                                                                    self.thigh_foot_[0], 
+                                                                    self.thigh_foot_[1], 
+                                                                    self.thigh_foot_[2]
                                                                 )
 
             except (LookupException, ConnectivityException, ExtrapolationException) as e:
@@ -188,5 +188,5 @@ class BodyController():
         command_msg.header.stamp = self.controller_node_.get_clock().now().to_msg()
         command_msg.name = self.joints_names_
         command_msg.position = command
-
-        return command_msg
+        gazebo_msg.data = command
+        return command_msg, gazebo_msg

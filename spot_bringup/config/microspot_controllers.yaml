@@ -1,11 +1,10 @@
 controller_manager:
   ros__parameters:
-    update_rate: 1000 # Hz (Bumped to 1kHz for fast manual PID control loops)
+    update_rate: 50 # Hz 
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-    # Change the type to a pure, raw position pass-through engine
     raw_position_bridge:
       type: position_controllers/JointGroupPositionController
 

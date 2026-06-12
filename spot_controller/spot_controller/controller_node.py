@@ -7,7 +7,7 @@ from body_controller import BodyController
 from gait_controller import GaitController
 from sensor_msgs.msg import JointState
 import numpy as np
-from rclpy.executors import SingleThreadedExecutor
+from std_msgs.msg import Float64MultiArray
 
 class ControllerNode(Node):
     """The ROS 2 Node logic"""
@@ -43,12 +43,14 @@ class ControllerNode(Node):
         self.body_controller_ = BodyController(self, self.joint_names, defaultZ= self.defaultZ_)
         self.gait_controller_ = GaitController(self, self.joint_names)
 
-        self.timer_ = self.create_timer(0.02, self.control_loop)
+        self.timer_ = self.create_timer(0.01, self.control_loop)
 
         self.joint_state_pub_ = self.create_publisher(JointState, '/joint_states', 10)
+        self.gazebo_pub_ = self.create_publisher(Float64MultiArray, '/raw_position_bridge/commands', 10)
 
         self.T_world_base_ = None
-    
+        self.thigh_foot_ = None
+
     def control_loop(self):
         if self.mode_swap_:
             if not self.swap_initiated_:    
@@ -56,19 +58,30 @@ class ControllerNode(Node):
                 self.swap_initiated_ = True
 
             if not self.body_controller_.reached_target_:
-                self.joint_state_pub_.publish(self.body_controller_.body_pose())
+                cmd_robot, cmd_gazebo = self.body_controller_.body_pose()
+                self.joint_state_pub_.publish(cmd_robot)
+                if cmd_gazebo is not None:
+                    self.gazebo_pub_.publish(cmd_gazebo)
+
             else:
                 self.mode_swap_ = False
             return 
 
         if self.isWalking:
-            self.get_logger().info("walking")
-            self.joint_state_pub_.publish(self.gait_controller_.trot_gait())
+            cmd_robot, cmd_gazebo = self.gait_controller_.trot_gait(thigh_foot=self.thigh_foot_)
+            self.joint_state_pub_.publish(cmd_robot)
+            if cmd_gazebo is not None:
+                self.gazebo_pub_.publish(cmd_gazebo)
+            
             # self.T_world_base_ = self.gait_controller_.getT()
         
         elif self.isStanding:
-            self.joint_state_pub_.publish(self.body_controller_.body_pose())
-            self.T_world_base_ = self.body_controller_.getT()
+            cmd_robot, cmd_gazebo = self.body_controller_.body_pose()
+            print(cmd_robot.position)
+            self.joint_state_pub_.publish(cmd_robot)
+            if cmd_gazebo is not None:
+                    self.gazebo_pub_.publish(cmd_gazebo)
+            self.T_world_base_, self.thigh_foot_= self.body_controller_.getT()
 
         elif self.isRotating:
             pass # To do
@@ -87,14 +100,14 @@ class ControllerNode(Node):
     def trot_gait_mode(self):
         self.get_logger().info('Executing walking...')
         self.off_mode()
-        self.mode_swap_ = True
+        self.mode_swap_ = False
         self.swap_initiated_ = False
         self.isWalking = True
     
     def standing_mode(self):
         self.get_logger().info('Executing standing...')
         self.off_mode()
-        self.mode_swap_ = True
+        self.mode_swap_ = False
         self.swap_initiated_ = False
         self.isStanding = True
 
@@ -104,8 +117,6 @@ class ControllerNode(Node):
         self.mode_swap_ = True
         self.swap_initiated_ = False
         self.isRotating = True
-import tkinter as tk
-import math
 
 class AppGUI:
     """The Tkinter Graphical Interface"""
@@ -144,8 +155,8 @@ class AppGUI:
         self.y_slider.pack()
 
         
-        self.z_slider = tk.Scale(root, from_=-0.2, to=0.2, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
-        self.z_slider.set(0.0)
+        self.z_slider = tk.Scale(root, from_=-0.18, to=-0.01, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
+        self.z_slider.set(-0.1)
         self.z_slider.pack()
 
         
@@ -178,7 +189,9 @@ class AppGUI:
             self.ros_node.body_controller_.update_target(desired_pose)
 
     def reset_sliders(self):
-        self.z_slider.set(0.0)
+        self.x_slider.set(0.0)
+        self.y_slider.set(0.0)
+        self.z_slider.set(self.ros_node.defaultZ_)
         self.roll_slider.set(0.0)
         self.pitch_slider.set(0.0)
         self.yaw_slider.set(0.0)
