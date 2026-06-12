@@ -22,11 +22,16 @@ MicroSpotAI is a four-legged robot inspired by the MicroSpot platform. The proje
 ### Simulation Environment
 Custom URDF model running in RViz and Gazebo.
 
+
 **Gazebo** 
     ![Gazebo Simulation](assets/spot_gazebo_sim.gif)
 
+
+
 **RViz** 
     ![MicroSpot Walking Test in Rviz](assets/spot_rviz_sim.gif)
+
+
 
 ## Core Features
 
