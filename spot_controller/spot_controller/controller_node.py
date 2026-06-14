@@ -3,24 +3,34 @@ from rclpy.node import Node
 import threading
 import tkinter as tk
 from tf2_ros import Buffer, TransformListener
-from spot_controller.body_controller import BodyController
+from body_controller import BodyController
 from spot_controller.gait_controller import GaitController
-from sensor_msgs.msg import JointState
+from sensor_msgs.msg import JointState, Imu
 import numpy as np
 from std_msgs.msg import Float64MultiArray
+from leg_ik_solver import LegIKSolver
+from stabilizer import Stabilizer
+from scipy.spatial.transform import Rotation as R
+from spot_controller.utils import quaternion_to_rpy
+from gui_controller import AppGUI
+
 
 class ControllerNode(Node):
     """The ROS 2 Node logic"""
-    def __init__(self):
+    def __init__(self, len_hip= 0.06, len_thigh= 0.13, len_knee= 0.13):
         super().__init__('controller_node')
 
-        self.joint_names = [
+        self.solver_ = LegIKSolver(len_hip, len_thigh, len_knee)
+
+        self.joint_names_ = [
             'front_right_hip_joint', 'front_right_thigh_joint', 'front_right_knee_joint',
             'back_right_hip_joint',  'back_right_thigh_joint',  'back_right_knee_joint',
             'back_left_hip_joint',   'back_left_thigh_joint',   'back_left_knee_joint',
             'front_left_hip_joint',  'front_left_thigh_joint',  'front_left_knee_joint'
         ]
 
+        self.links_ = ['front_right', 'back_right', 'back_left', 'front_left']
+        self.initialized_ = False
         self.defaultZ_ = -0.1
 
         self.defaultPose_ = np.array([
@@ -40,18 +50,107 @@ class ControllerNode(Node):
         self.tf_buffer_ = Buffer()
         self.tf_listener_ = TransformListener(self.tf_buffer_, self)
 
-        self.body_controller_ = BodyController(self, self.joint_names, defaultZ= self.defaultZ_)
-        self.gait_controller_ = GaitController(self, self.joint_names)
-
+        self.body_controller_ = BodyController(self, self.joint_names_, self.links_, defaultZ= self.defaultZ_)
+        self.gait_controller_ = GaitController(self, self.joint_names_)
+        self.stabilizer_ = None
         self.timer_ = self.create_timer(0.01, self.control_loop)
 
         self.joint_state_pub_ = self.create_publisher(JointState, '/joint_states', 10)
         self.gazebo_pub_ = self.create_publisher(Float64MultiArray, '/raw_position_bridge/commands', 10)
+        self.imu_sub_ = self.create_subscription(Imu,
+                                              '/imu/data',
+                                              self.imu_callback,
+                                              10)
+        self.T_world_foot_ = {}
+        self.T_base_thigh_ = {}
+        self.T_world_base_ = np.eye(4)
+        self.thigh_foot_ = None # In thigh frame
 
-        self.T_world_base_ = None
-        self.thigh_foot_ = None
+        self.imu_last_data_ = None
+
+    def imu_callback(self, msg):
+        self.imu_last_data_ = msg
+
+
+    def get_command(self, thigh_foot):
+        command = [0] * 12
+        for i, link in enumerate(self.links_):
+            idx = i * 3
+            command[idx], command[idx+1], command[idx+2] = self.solver_.solve(
+                                                                thigh_foot[link][0], 
+                                                                thigh_foot[link][1], 
+                                                                thigh_foot[link][2]
+                                                            )
+        return command
+    
+    def transform(self, frame_source, frame_dst):
+        tf = self.tf_buffer_.lookup_transform(
+                        target_frame=frame_source, 
+                        source_frame=frame_dst,
+                        time=rclpy.time.Time()
+                    )
+
+        q = tf.transform.rotation
+
+        Rot = R.from_quat([
+            q.x,
+            q.y,
+            q.z,
+            q.w
+        ]).as_matrix()
+
+        t = np.array([
+            tf.transform.translation.x,
+            tf.transform.translation.y,
+            tf.transform.translation.z
+        ])
+
+        T = np.eye(4)
+        T[:3,:3] = Rot
+        T[:3,3] = t
+
+        return T 
+    
+    def pid(self, thigh_foot=None):
+        thigh_foot = thigh_foot if thigh_foot is not None else self.thigh_foot_
+
+        thigh_foot_corrected = {}
+        if self.imu_last_data_ is None:
+            return  None
+        
+        roll_sensor, pitch_sensor, _ = quaternion_to_rpy(self.imu_last_data_.orientation.x,
+                                                         self.imu_last_data_.orientation.y,
+                                                         self.imu_last_data_.orientation.z,
+                                                         self.imu_last_data_.orientation.w)
+        
+        error = self.stabilizer_.compute_error(roll_sensor, pitch_sensor, self.T_world_base_, self.thigh_foot_, self.links_)
+
+        for link in self.links_:
+            thigh_foot_corrected[link] = self.thigh_foot_[link] - error[link]
+        
+        return thigh_foot_corrected
+    
 
     def control_loop(self):
+        if not self.initialized_:
+            try:
+                for link in self.links_:
+                    self.T_world_foot_[link] = self.transform(frame_source='base_link', frame_dst=f'{link}_feet')
+                    self.T_base_thigh_[link] = self.transform(frame_source='base_link', frame_dst=f'{link}_thigh')
+
+                self.initialized_ = True
+                self.stabilizer_ = Stabilizer(self.T_base_thigh_)
+                self.controller_node_.get_logger().info("Standing: Initialization OK!")
+
+            except Exception as e:
+                self.get_logger().warn(f"Waiting for TF: {e}")
+                command_msg = JointState()
+                command_msg.header.stamp = self.get_clock().now().to_msg()
+                command_msg.name = self.joint_names_
+                command_msg.position = [0] * 12
+                self.joint_state_pub_.publish(command_msg)
+                return
+            
         if self.mode_swap_:
             if not self.swap_initiated_:    
                 self.body_controller_.reset_pose(self.defaultPose_)
@@ -67,22 +166,37 @@ class ControllerNode(Node):
                 self.mode_swap_ = False
             return 
 
-        if self.isWalking:
-            cmd_robot, cmd_gazebo = self.gait_controller_.trot_gait(thigh_foot=self.thigh_foot_)
-            self.joint_state_pub_.publish(cmd_robot)
-            if cmd_gazebo is not None:
-                self.gazebo_pub_.publish(cmd_gazebo)
-            
-            # self.T_world_base_ = self.gait_controller_.getT()
+        thigh_foot_correct = None
         
-        elif self.isStanding:
-            cmd_robot, cmd_gazebo = self.body_controller_.body_pose()
-            print(cmd_robot.position)
-            self.joint_state_pub_.publish(cmd_robot)
-            if cmd_gazebo is not None:
-                    self.gazebo_pub_.publish(cmd_gazebo)
-            self.T_world_base_, self.thigh_foot_= self.body_controller_.getT()
+        if self.isWalking:
+            thigh_foot = self.gait_controller_.trot_gait(thigh_foot=self.thigh_foot_)
+            thigh_foot_correct = self.pid(thigh_foot)
 
+        elif self.isStanding:
+            self.thigh_foot_, self.T_world_base_ = self.body_controller_.body_pose(self.T_world_base_, 
+                                                                                   self.T_base_thigh_, 
+                                                                                   self.T_world_foot_, 
+                                                                                   self.links_
+                                                                                   )
+            
+            thigh_foot_correct = self.pid()
+
+        if thigh_foot_correct is not None:
+            command = self.get_command(thigh_foot=thigh_foot_correct)
+
+            # Publish to Gazebo
+            cmd_gazebo = Float64MultiArray()
+            cmd_gazebo.data = command
+            self.gazebo_pub_.publish(cmd_gazebo)
+
+            # Publish to Joint State topic 
+            cmd_robot = JointState()
+            cmd_robot.header.stamp = self.get_clock().now().to_msg()
+            cmd_robot.name = self.joint_names_
+            cmd_robot.position = command
+            self.joint_state_pub_.publish(cmd_robot)
+
+        
         elif self.isRotating:
             pass # To do
 
@@ -117,89 +231,6 @@ class ControllerNode(Node):
         self.mode_swap_ = True
         self.swap_initiated_ = False
         self.isRotating = True
-
-class AppGUI:
-    """The Tkinter Graphical Interface"""
-    def __init__(self, root, ros_node):
-        self.root = root
-        self.ros_node = ros_node
-        
-        self.root.title("Quadruped Control Panel")
-        self.root.geometry("500x700")
-        self.root.eval('tk::PlaceWindow . center') 
-
-
-        label = tk.Label(root, text="Select an Action", font=("Helvetica", 14, "bold"))
-        label.pack(pady=10)
-
-        btn_walk = tk.Button(root, text="Walk", command=ros_node.trot_gait_mode, width=20, bg="#4CAF50", fg="white")
-        btn_walk.pack(pady=5)
-
-        btn_stand = tk.Button(root, text="Stand", command=ros_node.standing_mode, width=20, bg="#2196F3", fg="white")
-        btn_stand.pack(pady=5)
-
-        btn_quit = tk.Button(root, text="Quit Node", command=self.quit_app, width=20, bg="#f44336", fg="white")
-        btn_quit.pack(pady=5)
-
-    
-        tk.Label(root, text="Body Pose Adjustments (Stand Mode Only)", font=("Helvetica", 12, "bold")).pack(pady=(20, 5))
-
-
-        self.x_slider = tk.Scale(root, from_=-0.2, to=0.2, resolution=0.01, orient=tk.HORIZONTAL, label="X", length=300, command=self.on_pose_change)
-        self.x_slider.set(0.0)
-        self.x_slider.pack()
-
-
-        self.y_slider = tk.Scale(root, from_=-0.2, to=0.2, resolution=0.01, orient=tk.HORIZONTAL, label="Y", length=300, command=self.on_pose_change)
-        self.y_slider.set(0.0)
-        self.y_slider.pack()
-
-        
-        self.z_slider = tk.Scale(root, from_=-0.18, to=-0.01, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
-        self.z_slider.set(-0.1)
-        self.z_slider.pack()
-
-        
-        self.roll_slider = tk.Scale(root, from_=-0.5, to=0.5, resolution=0.05, orient=tk.HORIZONTAL, label="Roll (Radians)", length=300, command=self.on_pose_change)
-        self.roll_slider.pack()
-
-        self.pitch_slider = tk.Scale(root, from_=-0.5, to=0.5, resolution=0.05, orient=tk.HORIZONTAL, label="Pitch (Radians)", length=300, command=self.on_pose_change)
-        self.pitch_slider.pack()
-
-        self.yaw_slider = tk.Scale(root, from_=-0.5, to=0.5, resolution=0.05, orient=tk.HORIZONTAL, label="Yaw (Radians)", length=300, command=self.on_pose_change)
-        self.yaw_slider.pack()
-
-        btn_reset = tk.Button(root, text="Reset Pose", command=self.reset_sliders, width=15)
-        btn_reset.pack(pady=10)
-
-        self.root.protocol("WM_DELETE_WINDOW", self.quit_app)
-
-    def on_pose_change(self, event=None):
-        # Only send updates if the robot is actually in the standing state
-        if getattr(self.ros_node, 'isStanding', False):
-            desired_pose = {
-                'x': float(self.x_slider.get()), 
-                'y': float(self.y_slider.get()),
-                'z': float(self.z_slider.get()),
-                'roll': float(self.roll_slider.get()),
-                'pitch': float(self.pitch_slider.get()),
-                'yaw': float(self.yaw_slider.get())
-            }
-            
-            self.ros_node.body_controller_.update_target(desired_pose)
-
-    def reset_sliders(self):
-        self.x_slider.set(0.0)
-        self.y_slider.set(0.0)
-        self.z_slider.set(self.ros_node.defaultZ_)
-        self.roll_slider.set(0.0)
-        self.pitch_slider.set(0.0)
-        self.yaw_slider.set(0.0)
-        self.on_pose_change()
-
-    def quit_app(self):
-        self.ros_node.get_logger().info("Closing GUI and shutting down ROS...")
-        self.root.quit()
 
 
 def main(args=None):

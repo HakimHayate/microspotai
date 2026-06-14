@@ -1,23 +1,21 @@
 import numpy as np
 from tf2_ros import LookupException, ConnectivityException, ExtrapolationException
 from sensor_msgs.msg import JointState
-from .leg_ik_solver import LegIKSolver
-from .utils import get_twist, update_pos
-from scipy.spatial.transform import Rotation as R
+
+from spot_controller.utils import get_twist, update_pos, get_rotation
+
 import math
 from std_msgs.msg import Float64MultiArray
 import rclpy
 
 class BodyController():
-    def __init__(self, controller_node, joints_names, defaultZ, duration = 1.0, 
-                 dt= 0.02, len_hip= 0.06, len_thigh= 0.13, len_knee= 0.13):
+    def __init__(self, controller_node, joints_names, links, defaultZ, duration = 1.0, 
+                 dt= 0.02):
         
         self.controller_node_ = controller_node
         self.joints_names_ = joints_names
 
-        self.links_ = ['front_right', 'back_right', 'back_left', 'front_left']
-
-        self.solver_ = LegIKSolver(len_hip, len_thigh, len_knee)
+        self.links_ = links
 
         self.duration_ = duration
         self.time_elapsed_ = 0.0
@@ -25,13 +23,7 @@ class BodyController():
 
         self.reached_target_ = True
         self.initialized_ = False # Initiate feet coordinates
-
-        self.thigh_foot_ = None
-        self.T_world_base_ = np.eye(4)
-        self.T_world_base_[2, -1] = defaultZ
-
-        self.T_world_foot_ = {}
-        self.T_world_thigh_initial_= {}
+        
         self.T_target_ = np.eye(4)
 
         self.S_ = None
@@ -42,20 +34,7 @@ class BodyController():
     def restart(self):
         self.time_elapsed_ = 0
 
-    def reset_pose(self, T_target, T_world_base=None):
-        '''
-        Bring the robot to the default pose
-        '''
-        self.T_world_base_ = T_world_base if T_world_base is not None else self.T_world_base_ # If another program changed chassis position, I update here
-        self.T_target_ = T_target
-        
-        self.S_ = get_twist(self.T_world_base_, self.T_target_, t=self.duration_)
-        
-        self.time_elapsed_ = 0.0
-
-        self.reached_target_ = False 
-
-    def update_target(self, desired_pose: dict) -> None:
+    def update_target(self, T_world_base, desired_pose: dict) -> None:
         """
         Calculates the new target transformation matrix and updates the twist trajectory.
 
@@ -69,26 +48,8 @@ class BodyController():
         roll = desired_pose.get('roll', 0)
         pitch = desired_pose.get('pitch', 0)
         yaw = desired_pose.get('yaw', 0)
-        
-        Rx = np.array([
-            [1, 0, 0],
-            [0, math.cos(roll), -math.sin(roll)],
-            [0, math.sin(roll), math.cos(roll)]
-        ])
 
-        Ry = np.array([
-            [math.cos(pitch), 0, math.sin(pitch)],
-            [0, 1, 0],
-            [-math.sin(pitch), 0, math.cos(pitch)],
-        ])
-
-        Rz = np.array([
-            [math.cos(yaw), -math.sin(yaw), 0],
-            [math.sin(yaw), math.cos(yaw), 0],
-            [0, 0, 1]
-        ])
-
-        Rxyz = Rz @ Ry @ Rx # Convention: Roll-Pitch-Yaw
+        Rxyz = get_rotation(roll, pitch, yaw) # Convention: Roll-Pitch-Yaw
 
         self.T_target_ = np.array([
             [Rxyz[0,0], Rxyz[0,1], Rxyz[0,2], x],
@@ -98,94 +59,34 @@ class BodyController():
         ])
 
         # Generate a new twist path from current position to new target
-        self.S_ = get_twist(self.T_world_base_, self.T_target_, t=self.duration_)
+        self.S_ = get_twist(T_world_base, self.T_target_, t=self.duration_)
         
         self.time_elapsed_ = 0.0
 
         self.reached_target_ = False   
 
         
-    def transform(self, frame_source, frame_dst):
-        tf = self.controller_node_.tf_buffer_.lookup_transform(
-                        target_frame=frame_source, 
-                        source_frame=frame_dst,
-                        time=rclpy.time.Time()
-                    )
-
-        q = tf.transform.rotation
-
-        Rot = R.from_quat([
-            q.x,
-            q.y,
-            q.z,
-            q.w
-        ]).as_matrix()
-
-        t = np.array([
-            tf.transform.translation.x,
-            tf.transform.translation.y,
-            tf.transform.translation.z
-        ])
-
-        T = np.eye(4)
-        T[:3,:3] = Rot
-        T[:3,3] = t
-
-        return T
-        
-    def body_pose(self):
-        command_msg = JointState()       
-        gazebo_msg = Float64MultiArray()
-        if not self.initialized_:
-            try:
-                for link in self.links_:
-                    self.T_world_foot_[link] = self.transform(frame_source='base_link', frame_dst=f'{link}_feet')
-                    self.T_world_thigh_initial_[link] = self.transform(frame_source='base_link', frame_dst=f'{link}_thigh')
-
-                self.initialized_ = True
-                self.controller_node_.get_logger().info("Standing: Initialization OK!")
-
-            except Exception as e:
-                self.controller_node_.get_logger().warn(f"Waiting for TF: {e}")
-
-                command_msg.header.stamp = self.controller_node_.get_clock().now().to_msg()
-                command_msg.name = self.joints_names_
-                command_msg.position = [0] * 12
-                
-                
-                return command_msg, None
-            
+    def body_pose(self, T_world_base, T_base_thigh, T_world_foot, links):
         if self.time_elapsed_>= self.duration_: # Robot reached target pose
             self.reached_target_ = True
+
         elif not self.reached_target_:
             self.time_elapsed_ += self.dt_
             # Robot moves slighly each frame to make a smooth movement
-            self.T_world_base_ = update_pos(self.T_world_base_, self.S_, dt=self.dt_)
+            T_world_base = update_pos(T_world_base, self.S_, dt=self.dt_)
 
-        command = [0] * 12
+        thigh_foot = {}
 
-        for i, link in enumerate(self.links_):
+        for i, link in enumerate(links):
             try:
-                T_world_thigh_current = self.T_world_base_ @ self.T_world_thigh_initial_[link] # Move thighs coordiantes to new coordinates
+                T_world_thigh_current = T_world_base @ T_base_thigh[link] # Move thighs coordinates to new coordinates
                 T_thigh_world = np.linalg.inv(T_world_thigh_current)
 
-                T_thigh_foot = T_thigh_world @ self.T_world_foot_[link] # Foot coordinates in thigh frame
+                T_thigh_foot = T_thigh_world @ T_world_foot[link] # Foot coordinates in thigh frame
                 
-                self.thigh_foot_ = (T_thigh_foot[:-1, -1]).flatten()
-                
-                idx = i * 3
-                command[idx], command[idx+1], command[idx+2] = self.solver_.solve(
-                                                                    self.thigh_foot_[0], 
-                                                                    self.thigh_foot_[1], 
-                                                                    self.thigh_foot_[2]
-                                                                )
+                thigh_foot[link] = T_thigh_foot[:-1, -1]
 
             except (LookupException, ConnectivityException, ExtrapolationException) as e:
                 self.controller_node_.get_logger().warn(f'TF Error: {e}')
 
-
-        command_msg.header.stamp = self.controller_node_.get_clock().now().to_msg()
-        command_msg.name = self.joints_names_
-        command_msg.position = command
-        gazebo_msg.data = command
-        return command_msg, gazebo_msg
+        return thigh_foot, T_world_base

@@ -1,5 +1,5 @@
 import math
-
+import numpy as np
 class LegIKSolver:
     def __init__(self, l1, l2, l3):
         """
@@ -22,8 +22,8 @@ class LegIKSolver:
 
         d = math.sqrt(x**2 + y**2 + z**2) 
 
-        gamma = math.acos((self.l2**2 + self.l3**2 - d**2)/(2 * self.l2 * self.l3))
-        beta = -math.acos((self.l2**2 + d**2 - self.l3**2)/(2 * self.l2 * d))
+        gamma = math.acos(np.clip((self.l2**2 + self.l3**2 - d**2)/(2 * self.l2 * self.l3), -1.0, 1.0))
+        beta = -math.acos(np.clip((self.l2**2 + d**2 - self.l3**2)/(2 * self.l2 * d), -1.0, 1.0))
 
         alpha = math.atan2(z, x)
 
