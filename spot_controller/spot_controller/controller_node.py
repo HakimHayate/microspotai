@@ -4,14 +4,14 @@ import threading
 import tkinter as tk
 from tf2_ros import Buffer, TransformListener
 from body_controller import BodyController
-from spot_controller.gait_controller import GaitController
+from gait_controller import GaitController
 from sensor_msgs.msg import JointState, Imu
 import numpy as np
 from std_msgs.msg import Float64MultiArray
 from leg_ik_solver import LegIKSolver
 from stabilizer import Stabilizer
 from scipy.spatial.transform import Rotation as R
-from spot_controller.utils import quaternion_to_rpy
+from utils import quaternion_to_rpy
 from gui_controller import AppGUI
 
 
@@ -51,7 +51,7 @@ class ControllerNode(Node):
         self.tf_listener_ = TransformListener(self.tf_buffer_, self)
 
         self.body_controller_ = BodyController(self, self.joint_names_, self.links_, defaultZ= self.defaultZ_)
-        self.gait_controller_ = GaitController(self, self.joint_names_)
+        self.gait_controller_ = GaitController()
         self.stabilizer_ = None
         self.timer_ = self.create_timer(0.01, self.control_loop)
 
@@ -126,7 +126,7 @@ class ControllerNode(Node):
         error = self.stabilizer_.compute_error(roll_sensor, pitch_sensor, self.T_world_base_, self.thigh_foot_, self.links_)
 
         for link in self.links_:
-            thigh_foot_corrected[link] = self.thigh_foot_[link] - error[link]
+            thigh_foot_corrected[link] = thigh_foot[link] - error[link]
         
         return thigh_foot_corrected
     
@@ -151,25 +151,11 @@ class ControllerNode(Node):
                 self.joint_state_pub_.publish(command_msg)
                 return
             
-        if self.mode_swap_:
-            if not self.swap_initiated_:    
-                self.body_controller_.reset_pose(self.defaultPose_)
-                self.swap_initiated_ = True
-
-            if not self.body_controller_.reached_target_:
-                cmd_robot, cmd_gazebo = self.body_controller_.body_pose()
-                self.joint_state_pub_.publish(cmd_robot)
-                if cmd_gazebo is not None:
-                    self.gazebo_pub_.publish(cmd_gazebo)
-
-            else:
-                self.mode_swap_ = False
-            return 
 
         thigh_foot_correct = None
         
         if self.isWalking:
-            thigh_foot = self.gait_controller_.trot_gait(thigh_foot=self.thigh_foot_)
+            thigh_foot = self.gait_controller_.trot_gait(self.thigh_foot_, self.links_)
             thigh_foot_correct = self.pid(thigh_foot)
 
         elif self.isStanding:
@@ -195,7 +181,7 @@ class ControllerNode(Node):
             cmd_robot.name = self.joint_names_
             cmd_robot.position = command
             self.joint_state_pub_.publish(cmd_robot)
-
+            
         
         elif self.isRotating:
             pass # To do
@@ -214,22 +200,16 @@ class ControllerNode(Node):
     def trot_gait_mode(self):
         self.get_logger().info('Executing walking...')
         self.off_mode()
-        self.mode_swap_ = False
-        self.swap_initiated_ = False
         self.isWalking = True
     
     def standing_mode(self):
         self.get_logger().info('Executing standing...')
         self.off_mode()
-        self.mode_swap_ = False
-        self.swap_initiated_ = False
         self.isStanding = True
 
     def rotating_mode(self):
         self.get_logger().info('Executing rotating...')
         self.off_mode()
-        self.mode_swap_ = True
-        self.swap_initiated_ = False
         self.isRotating = True
 
 

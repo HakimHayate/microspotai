@@ -2,7 +2,7 @@ import numpy as np
 from tf2_ros import LookupException, ConnectivityException, ExtrapolationException
 from sensor_msgs.msg import JointState
 
-from spot_controller.utils import get_twist, update_pos, get_rotation
+from utils import get_twist, update_pos, get_rotation
 
 import math
 from std_msgs.msg import Float64MultiArray
