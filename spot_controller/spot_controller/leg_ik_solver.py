@@ -1,5 +1,6 @@
 import math
 import numpy as np
+
 class LegIKSolver:
     def __init__(self, l1, l2, l3):
         """

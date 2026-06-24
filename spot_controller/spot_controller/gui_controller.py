@@ -21,6 +21,9 @@ class AppGUI:
         btn_stand = tk.Button(root, text="Stand", command=ros_node.standing_mode, width=20, bg="#2196F3", fg="white")
         btn_stand.pack(pady=5)
 
+        btn_stand = tk.Button(root, text="Move Arm", command=ros_node.arm_mode, width=20, bg="#2196F3", fg="white")
+        btn_stand.pack(pady=5)
+
         btn_quit = tk.Button(root, text="Quit Node", command=self.quit_app, width=20, bg="#f44336", fg="white")
         btn_quit.pack(pady=5)
 

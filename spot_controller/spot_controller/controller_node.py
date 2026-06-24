@@ -13,7 +13,7 @@ from stabilizer import Stabilizer
 from scipy.spatial.transform import Rotation as R
 from utils import quaternion_to_rpy
 from gui_controller import AppGUI
-
+from arm_controller import ArmController
 
 class ControllerNode(Node):
     """The ROS 2 Node logic"""
@@ -43,6 +43,7 @@ class ControllerNode(Node):
         self.isWalking = False
         self.isStanding = False
         self.isRotating = False
+        self.isArmMoving = False
 
         self.mode_swap_ = False
         self.swap_initiated_ = False
@@ -67,6 +68,20 @@ class ControllerNode(Node):
         self.thigh_foot_ = None # In thigh frame
 
         self.imu_last_data_ = None
+
+        self.subscription_ = self.create_subscription(
+            Float64MultiArray,
+            'target_pose',
+            self.arm_pose_callback,
+            10
+        )
+        self.body_angles_ = {}
+        self.arm_controller_ = ArmController()
+    
+    def arm_pose_callback(self, msg):
+        self.arm_controller_.x_desired_ = list(msg.data[:6])
+        self.arm_controller_.end_effector = np.array(msg.data[6:])
+
 
     def imu_callback(self, msg):
         self.imu_last_data_ = msg
@@ -156,7 +171,7 @@ class ControllerNode(Node):
         
         if self.isWalking:
             thigh_foot = self.gait_controller_.trot_gait(self.thigh_foot_, self.links_)
-            thigh_foot_correct = self.pid(thigh_foot)
+            thigh_foot_correct = thigh_foot #self.pid(thigh_foot)
 
         elif self.isStanding:
             self.thigh_foot_, self.T_world_base_ = self.body_controller_.body_pose(self.T_world_base_, 
@@ -165,10 +180,32 @@ class ControllerNode(Node):
                                                                                    self.links_
                                                                                    )
             
-            thigh_foot_correct = self.pid()
+            thigh_foot_correct = self.thigh_foot_ # self.pid()
 
+        
+        
+        elif self.isRotating:
+            pass # To do
+
+        elif self.isArmMoving:
+            res = self.arm_controller_.control_loop()
+            if res is None:
+                return
+            command, arm_joint_names = res['command'], res['joint_names']
+            cmd_arm = JointState()
+            cmd_arm.header.stamp = self.get_clock().now().to_msg()
+            cmd_arm.name = arm_joint_names
+            cmd_arm.position = command
+            self.joint_state_pub_.publish(cmd_arm)
+            return
+
+        else:
+            pass # To do
+            
         if thigh_foot_correct is not None:
             command = self.get_command(thigh_foot=thigh_foot_correct)
+            for joint_name, angle in zip(self.joint_names_, command):
+                self.body_angles_[joint_name] = angle
 
             # Publish to Gazebo
             cmd_gazebo = Float64MultiArray()
@@ -182,12 +219,6 @@ class ControllerNode(Node):
             cmd_robot.position = command
             self.joint_state_pub_.publish(cmd_robot)
             
-        
-        elif self.isRotating:
-            pass # To do
-
-        else:
-            pass # To do
 
     def off_mode(self):
         self.isWalking = False
@@ -211,6 +242,11 @@ class ControllerNode(Node):
         self.get_logger().info('Executing rotating...')
         self.off_mode()
         self.isRotating = True
+    
+    def arm_mode(self):
+        self.get_logger().info('Arm controlling...')
+        self.off_mode()
+        self.isArmMoving = True
 
 
 def main(args=None):

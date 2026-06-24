@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot name="spot_arm" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find microspot_description)/urdf/microspot.urdf" />
+
+    <xacro:include filename="$(find microspot_description)/urdf/robot.urdf" />
+
+    <joint name="microspot_to_arm_mount" type="fixed">
+        
+        <parent link="base_link"/> 
+        
+        <child link="base_arm"/> 
+        
+        <origin xyz="0.05 0.0 0.03" rpy="0 3.14 0"/> 
+        
+    </joint>
+
+</robot>

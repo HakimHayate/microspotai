@@ -41,11 +41,11 @@ class GaitController():
             
         return x, 0, z
     
-
+ 
     def restart(self):
         self.time_elapsed_ = 0
 
-
+ 
     def trot_gait(self, thigh_foot, links, reset=False):
         if reset:
             self.time_elapsed_ = 0

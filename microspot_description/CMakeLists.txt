@@ -5,7 +5,7 @@ project(microspot_description)
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY urdf rviz launch config
+  DIRECTORY urdf rviz launch config meshes
   DESTINATION share/${PROJECT_NAME}
 )
 

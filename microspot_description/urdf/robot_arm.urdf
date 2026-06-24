@@ -1,0 +1,403 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="robot_arm">
+    <link name="base_arm"/>
+
+    <link name="base">
+        <inertial>
+            <origin xyz="-0.00584646080312836 -7.3873373338071754e-09 -0.004012834319885124" rpy="0.0 0.0 0.0" />
+            <mass value="0.13361686399416903" />
+            <inertia ixx="5.8939729020783356e-05" iyy="5.6592918012148005e-05" izz="6.854371519910996e-05" ixy="-6.99349705446744e-11" iyz="-8.5886773028627e-12" ixz="-1.7907551978337e-07" />
+        </inertial>
+        <visual name="base_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/base.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="base_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/base.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="world_base" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="3.14 0 0" />
+        <parent link="base_arm" />
+        <child link="base" />
+    </joint>
+
+    <link name="link_1">
+        <inertial>
+            <origin xyz="-3.390200786768105e-11 -0.005121532313427566 -4.748528394937779e-09" rpy="0.0 -0.0 -8.572071991599574e-76" />
+            <mass value="0.0205825708955109" />
+            <inertia ixx="3.276012308613693e-06" iyy="2.3136165056857327e-06" izz="3.276012308163427e-06" ixy="7.167619481203728e-15" iyz="-1.2825779663588194e-14" ixz="-7.279566320128172e-15" />
+        </inertial>
+        <visual name="base_rotor_visual">
+            <origin xyz="-9.992007221626409e-17 -0.003800001056510016 -4.809081373124969e-09" rpy="1.5707963267948974 -4.733165431326075e-30 1.2767446198576543e-15" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/base_rotor.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="base_rotor_collision">
+            <origin xyz="-9.992007221626409e-17 -0.003800001056510016 -4.809081373124969e-09" rpy="1.5707963267948974 -4.733165431326075e-30 1.2767446198576543e-15" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/base_rotor.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_2">
+        <inertial>
+            <origin xyz="5.800542224543293e-08 0.025455863746017764 0.005860275071672178" rpy="0.0 -0.0 0.0" />
+            <mass value="0.03936689997861309" />
+            <inertia ixx="1.3812710808048091e-05" iyy="9.199611516837318e-06" izz="1.6104361536498297e-05" ixy="7.211364804390603e-12" iyz="-2.7826085290265784e-07" ixz="-4.050635108552315e-11" />
+        </inertial>
+        <visual name="drivebig_visual">
+            <origin xyz="-8.992806499463768e-16 0.03199999894348995 0.004999995190918689" rpy="-9.159339953157616e-16 -1.224646799147093e-16 -3.1415926535897687" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivebig.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivebig_collision">
+            <origin xyz="-8.992806499463768e-16 0.03199999894348995 0.004999995190918689" rpy="-9.159339953157616e-16 -1.224646799147093e-16 -3.1415926535897687" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivebig.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_4">
+        <inertial>
+            <origin xyz="0.007097385776134644 6.23124624787863e-09 0.01670261555933651" rpy="0.0 -0.0 -5.309020986220915e-93" />
+            <mass value="0.022783062974825415" />
+            <inertia ixx="6.3237490239767406e-06" iyy="5.892532951500359e-06" izz="6.323750024922161e-06" ixy="-8.165228861392539e-13" iyz="1.482501594358629e-12" ixz="-1.431870726659993e-06" />
+        </inertial>
+        <visual name="connector_corner_visual">
+            <origin xyz="0.02379999999999961 -1.0565094843428823e-09 0.02379999846388836" rpy="-2.4589004585091578e-14 1.5707963267948832 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/connector_corner.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="connector_corner_collision">
+            <origin xyz="0.02379999999999961 -1.0565094843428823e-09 0.02379999846388836" rpy="-2.4589004585091578e-14 1.5707963267948832 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/connector_corner.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_5">
+        <inertial>
+            <origin xyz="0.04072797462224379 -0.0002336673898725916 -9.688549336344998e-05" rpy="0.0 -0.0 0.0" />
+            <mass value="0.04251854931472677" />
+            <inertia ixx="7.593853554059267e-06" iyy="3.2397711764130295e-05" izz="3.2304781476408075e-05" ixy="-3.687487938934747e-07" iyz="4.646748698439151e-08" ixz="-1.5273906064995383e-07" />
+        </inertial>
+        <visual name="connector_straight_visual">
+            <origin xyz="0.03999999999999957 -1.0565094399339615e-09 -1.5361121974422077e-09" rpy="-1.942890293093907e-15 1.570796326794884 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/connector_straight.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="connector_straight_collision">
+            <origin xyz="0.03999999999999957 -1.0565094399339615e-09 -1.5361121974422077e-09" rpy="-1.942890293093907e-15 1.570796326794884 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/connector_straight.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_6">
+        <inertial>
+            <origin xyz="0.025455864802527355 5.6948913700338724e-08 -0.005860281416866542" rpy="0.0 -0.0 0.0" />
+            <mass value="0.03936689997861309" />
+            <inertia ixx="9.199611516837322e-06" iyy="1.3812710808048037e-05" izz="1.6104361536498405e-05" ixy="7.211364643454343e-12" iyz="4.050635106739135e-11" ixz="2.7826085290274085e-07" />
+        </inertial>
+        <visual name="drivebig-1_visual">
+            <origin xyz="0.03199999999999953 -1.0565092711800616e-09 -0.005000001536113139" rpy="3.14159265358978 8.383884571945006e-16 -1.5707963267948943" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivebig-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivebig-1_collision">
+            <origin xyz="0.03199999999999953 -1.0565092711800616e-09 -0.005000001536113139" rpy="3.14159265358978 8.383884571945006e-16 -1.5707963267948943" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivebig-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_8">
+        <inertial>
+            <origin xyz="-7.287757615159762e-09 0.007097381848042863 -0.0167026190329478" rpy="0.0 -0.0 0.0" />
+            <mass value="0.022783062974825415" />
+            <inertia ixx="5.892532951500332e-06" iyy="6.323750024922242e-06" izz="6.323749023976822e-06" ixy="1.4825016485687376e-12" iyz="1.4318707266599946e-06" ixz="8.165229043504622e-13" />
+        </inertial>
+        <visual name="connector_corner-1_visual">
+            <origin xyz="-1.0125233984581429e-15 -1.0565092267711408e-09 -4.809082931878095e-09" rpy="2.5590640717609827e-14 -9.077773962335396e-16 1.5707963267948988" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/connector_corner-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="connector_corner-1_collision">
+            <origin xyz="-1.0125233984581429e-15 -1.0565092267711408e-09 -4.809082931878095e-09" rpy="2.5590640717609827e-14 -9.077773962335396e-16 1.5707963267948988" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/connector_corner-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_9">
+        <inertial>
+            <origin xyz="0.00023366152428031973 0.040727973565735064 -9.688395724948507e-05" rpy="-1.1885406294656166e-90 -0.0 0.0" />
+            <mass value="0.04251854931472677" />
+            <inertia ixx="3.2397711764129604e-05" iyy="7.593853554059213e-06" izz="3.230478147640782e-05" ixy="3.6874879389335276e-07" iyz="-1.5273906065036043e-07" ixz="-4.646748698441185e-08" />
+        </inertial>
+        <visual name="connector_straight-1_visual">
+            <origin xyz="-4.809082829737577e-09 0.03999999894349083 1.758593271006248e-15" rpy="-1.5707963267948957 1.570796326794871 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/connector_straight-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="connector_straight-1_collision">
+            <origin xyz="-4.809082829737577e-09 0.03999999894349083 1.758593271006248e-15" rpy="-1.5707963267948957 1.570796326794871 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/connector_straight-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_10">
+        <inertial>
+            <origin xyz="3.9960392275162346e-08 0.013275571030694914 0.006746442857582427" rpy="0.0 -0.0 -2.149148622414654e-62" />
+            <mass value="0.0209803714773982" />
+            <inertia ixx="4.550340283416654e-06" iyy="4.1310510718392405e-06" izz="4.516305471598736e-06" ixy="-6.693205343265285e-12" iyz="-6.826126048875012e-07" ixz="-1.1018164208293673e-12" />
+        </inertial>
+        <visual name="drivesmall_visual">
+            <origin xyz="-1.0835776720341528e-15 0.011799998943490628 -0.007000004809082778" rpy="3.141592653589768 9.077773962418239e-16 -1.570796326794977" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivesmall_collision">
+            <origin xyz="-1.0835776720341528e-15 0.011799998943490628 -0.007000004809082778" rpy="3.141592653589768 9.077773962418239e-16 -1.570796326794977" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_14">
+        <inertial>
+            <origin xyz="-0.013275572087206049 -4.101689853541757e-08 -0.006746452475753584" rpy="0.0 -0.0 0.0" />
+            <mass value="0.0209803714773982" />
+            <inertia ixx="4.131051071839566e-06" iyy="4.550340283416627e-06" izz="4.516305471598736e-06" ixy="-6.693205343265285e-12" iyz="-1.1018162836100298e-12" ixz="-6.826126048875309e-07" />
+        </inertial>
+        <visual name="drivesmall-1_visual">
+            <origin xyz="-0.011800000000003266 -1.0565057806388722e-09 0.006999995190911763" rpy="8.547016553210208e-16 -1.1052025906777729e-13 -8.022749131699552e-14" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivesmall-1_collision">
+            <origin xyz="-0.011800000000003266 -1.0565057806388722e-09 0.006999995190911763" rpy="8.547016553210208e-16 -1.1052025906777729e-13 -8.022749131699552e-14" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_15">
+        <inertial>
+            <origin xyz="-0.00010306216161255045 -4.26911460705881e-05 -0.001084485301381526" rpy="0.0 -0.0 -1.2446030555722283e-60" />
+            <mass value="0.01612604189282462" />
+            <inertia ixx="1.8228009728565734e-06" iyy="1.8034379757027796e-06" izz="2.030088928912715e-06" ixy="9.682180126169195e-09" iyz="7.67068123339802e-09" ixz="1.8517915402204056e-08" />
+        </inertial>
+        <visual name="drivesmall_rotor_visual">
+            <origin xyz="-3.8191672047105384e-16 1.0565052122046837e-09 -0.0037999951909112053" rpy="-3.1415926535897922 2.344905375549831e-13 8.022749131699563e-14" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivesmall_rotor_collision">
+            <origin xyz="-3.8191672047105384e-16 1.0565052122046837e-09 -0.0037999951909112053" rpy="-3.1415926535897922 2.344905375549831e-13 8.022749131699563e-14" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_3">
+        <inertial>
+            <origin xyz="0.00010306216161213743 4.2691146065756416e-05 -0.0010844916465815825" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01612604189282462" />
+            <inertia ixx="1.8228009728566953e-06" iyy="1.8034379757027635e-06" izz="2.0300889289126068e-06" ixy="9.682180126174277e-09" iyz="-7.670681233404796e-09" ixz="-1.8517915402149e-08" />
+        </inertial>
+        <visual name="drivesmall_rotor-1_visual">
+            <origin xyz="-6.683542608243443e-16 -1.0565100350135026e-09 -0.0038000015361112373" rpy="3.1415926535897922 -6.245004513516283e-16 -3.1415926535897687" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivesmall_rotor-1_collision">
+            <origin xyz="-6.683542608243443e-16 -1.0565100350135026e-09 -0.0038000015361112373" rpy="3.1415926535897922 -6.245004513516283e-16 -3.1415926535897687" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_7">
+        <inertial>
+            <origin xyz="-0.00010306216161360738 4.269114606655578e-05 0.0010844853013873524" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01612604189282462" />
+            <inertia ixx="1.8228009728566953e-06" iyy="1.8034379757027796e-06" izz="2.0300889289126068e-06" ixy="-9.682180126169195e-09" iyz="7.670681233411573e-09" ixz="-1.851791540213968e-08" />
+        </inertial>
+        <visual name="drivesmall_rotor-2_visual">
+            <origin xyz="-7.283063041541027e-16 -1.056509235652925e-09 0.0037999951909170092" rpy="9.355329718491719e-16 2.5895952049381713e-14 2.186969284908805e-15" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-2.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivesmall_rotor-2_collision">
+            <origin xyz="-7.283063041541027e-16 -1.056509235652925e-09 0.0037999951909170092" rpy="9.355329718491719e-16 2.5895952049381713e-14 2.186969284908805e-15" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-2.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_11">
+        <inertial>
+            <origin xyz="0.00010306216161303893 -4.269114606625379e-05 0.0010844949195530696" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01612604189282462" />
+            <inertia ixx="1.8228009728565734e-06" iyy="1.8034379757027254e-06" izz="2.0300889289124983e-06" ixy="-9.682180126169195e-09" iyz="-7.67068123339802e-09" ixz="1.8517915402166787e-08" />
+        </inertial>
+        <visual name="drivesmall_rotor-3_visual">
+            <origin xyz="5.506706202140776e-16 1.056509510988235e-09 0.0038000048090827267" rpy="-9.771663352796635e-16 -1.1872897055609947e-13 -3.141592653589713" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-3.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivesmall_rotor-3_collision">
+            <origin xyz="5.506706202140776e-16 1.056509510988235e-09 0.0038000048090827267" rpy="-9.771663352796635e-16 -1.1872897055609947e-13 -3.141592653589713" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-3.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_12">
+        <inertial>
+            <origin xyz="-0.006746447666667557 -4.101690173285988e-08 0.013275567278120626" rpy="0.0 -0.0 0.0" />
+            <mass value="0.0209803714773982" />
+            <inertia ixx="4.516305471598844e-06" iyy="4.5503402834166e-06" izz="4.131051071839132e-06" ixy="-1.1018163378201384e-12" iyz="6.693205316160231e-12" ixz="6.826126048875038e-07" />
+        </inertial>
+        <visual name="drivesmall-2_visual">
+            <origin xyz="0.00699999999999779 -1.0565099728410132e-09 0.011799995190917843" rpy="8.010502663708126e-14 1.5707963267947862 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall-2.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivesmall-2_collision">
+            <origin xyz="0.00699999999999779 -1.0565099728410132e-09 0.011799995190917843" rpy="8.010502663708126e-14 1.5707963267947862 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall-2.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="link_13">
+        <inertial>
+            <origin xyz="0.001084490110467584 -4.2691146068598584e-05 -0.00010305735252697624" rpy="-2.802596928649634e-45 -0.0 0.0" />
+            <mass value="0.01612604189282462" />
+            <inertia ixx="2.030088928912606e-06" iyy="1.8034379757028334e-06" izz="1.8228009728568986e-06" ixy="-7.670681233370912e-09" iyz="9.682180126196299e-09" ixz="-1.851791540217356e-08" />
+        </inertial>
+        <visual name="drivesmall_rotor-4_visual">
+            <origin xyz="0.0037999999999972544 1.0565073793600277e-09 4.8090855297999726e-09" rpy="-3.141592653589728 -1.5707963267947862 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-4.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="drivesmall_rotor-4_collision">
+            <origin xyz="0.0037999999999972544 1.0565073793600277e-09 4.8090855297999726e-09" rpy="-3.141592653589728 -1.5707963267947862 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-4.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="base_rotor_Rigid-16" type="fixed">
+        <origin xyz="0.0 0.0092 0.0" rpy="1.9721522630525295e-31 -1.9721522630525295e-31 -1.401298464324817e-45" />
+        <parent link="link_1" />
+        <child link="link_2" />
+    </joint>
+    <joint name="joint_5" type="revolute">
+        <origin xyz="0.0 0.021800000000000007 0.026146680000000002" rpy="-3.944304526105059e-31 1.9721522630524862e-31 3.048372673850124e-30" />
+        <parent link="link_2" />
+        <child link="link_3" />
+        <axis xyz="0.0 -1.9721522630525295e-31 1.0" />
+        <limit lower="0.0" upper="3.141593" effort="4.0" velocity="10.0" />
+    </joint>
+    <joint name="drivesmall_rotor-1_Rigid-19" type="fixed">
+        <origin xyz="0.0 0.0 0.0092" rpy="1.9721522630525295e-31 -9.860761315262648e-32 -2.5023715346163465e-30" />
+        <parent link="link_3" />
+        <child link="link_4" />
+    </joint>
+    <joint name="connector_corner_Rigid-20" type="fixed">
+        <origin xyz="0.023799999999999998 0.0 0.023799999999999998" rpy="7.236103987053064e-30 -1.4791141972893971e-30 -5.460011392337774e-31" />
+        <parent link="link_4" />
+        <child link="link_5" />
+    </joint>
+    <joint name="drivesmall_rotor-3_Rigid-21" type="fixed">
+        <origin xyz="0.0 0.0 -0.0092" rpy="3.141592653589793 -2.524354896707238e-29 1.744502634390193e-29" />
+        <parent link="link_11" />
+        <child link="link_12" />
+    </joint>
+    <joint name="drivesmall_rotor-4_Rigid-22" type="fixed">
+        <origin xyz="-0.0092 0.0 0.0" rpy="-3.141592653589793 -1.262177448353619e-29 -2.4794535830791282e-58" />
+        <parent link="link_13" />
+        <child link="link_14" />
+    </joint>
+    <joint name="joint_4" type="revolute">
+        <origin xyz="-0.005299999999999895 4.809081373124969e-09 -0.04150000105651003" rpy="-1.5707963267948974 -2.1926904736346838e-15 -3.686229913557171e-30" />
+        <parent link="base" />
+        <child link="link_1" />
+        <axis xyz="-1.401298464324817e-45 -1.0 1.9721522630525295e-31" />
+        <limit lower="0.0" upper="3.141593" effort="4.0" velocity="10.0" />
+    </joint>
+    <joint name="connector_straight_Rigid-24" type="fixed">
+        <origin xyz="0.08 -8.881784197001253e-18 0.0" rpy="-6.923910743063235e-30 -0.0 0.0" />
+        <parent link="link_5" />
+        <child link="link_6" />
+    </joint>
+    <joint name="joint_3" type="revolute">
+        <origin xyz="0.021799999999999996 0.0 -0.026146679999999995" rpy="-3.1219324398982885e-31 1.5777218104420236e-30 4.2015980304144435e-31" />
+        <parent link="link_6" />
+        <child link="link_7" />
+        <axis xyz="0.0 0.0 -1.0" />
+        <limit lower="0.0" upper="3.141593" effort="4.0" velocity="10.0" />
+    </joint>
+    <joint name="drivesmall_rotor-2_Rigid-26" type="fixed">
+        <origin xyz="0.0 0.0 -0.009200000000000002" rpy="0.0 -0.0 -5.8641917342869425e-31" />
+        <parent link="link_7" />
+        <child link="link_8" />
+    </joint>
+    <joint name="connector_corner-1_Rigid-27" type="fixed">
+        <origin xyz="0.0 0.023799999999999998 -0.023799999999999998" rpy="1.1286992286420202e-31 -1.5707963267948966 0" />
+        <parent link="link_8" />
+        <child link="link_9" />
+    </joint>
+    <joint name="connector_straight-1_Rigid-28" type="fixed">
+        <origin xyz="0.0 0.08 0.0" rpy="2.9582283945787943e-30 1.5707963267948966 0" />
+        <parent link="link_9" />
+        <child link="link_10" />
+    </joint>
+    <joint name="joint_2" type="revolute">
+        <origin xyz="0.0 0.017100000000000008 0.027000000000000003" rpy="-3.141592653589793 1.0897478164734435e-31 5.5567127832169076e-30" />
+        <parent link="link_10" />
+        <child link="link_11" />
+        <axis xyz="0.0 0.0 -1.0" />
+        <limit lower="0.0" upper="3.141593" effort="4.0" velocity="10.0" />
+    </joint>
+    <joint name="joint_1" type="revolute">
+        <origin xyz="-0.026999999999999993 0.0 0.0171" rpy="3.141592653589793 -2.524354896707238e-29 1.504375718156907e-29" />
+        <parent link="link_12" />
+        <child link="link_13" />
+        <axis xyz="0.9999999999999999 -0.0 1.262177448353619e-29" />
+        <limit lower="0.0" upper="3.141593" effort="4.0" velocity="10.0" />
+    </joint>
+    <joint name="joint_end_effector" type="revolute">
+        <origin xyz="-0.0171 0.0 -0.027000000000000003" rpy="-3.141592653589793 -0.0 1.8731201475384047e-29" />
+        <parent link="link_14" />
+        <child link="link_15" />
+        <axis xyz="1.262177448353619e-29 -9.860761315262648e-32 1.0" />
+        <limit lower="0.0" upper="3.141593" effort="4.0" velocity="10.0" />
+    </joint>
+</robot>

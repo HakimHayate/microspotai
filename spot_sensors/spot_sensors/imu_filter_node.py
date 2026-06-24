@@ -20,6 +20,7 @@ def get_prediction(angular_velocity_x, angular_velocity_y, prev_angle, dt=0.01):
 def complemenary_filter(prediction_angle, correction_angle, alpha=0.95):
     return alpha * prediction_angle + (1-alpha) * correction_angle
 
+
 def euler_to_quaternion(euler_angle):
     
     roll = euler_angle[0]
