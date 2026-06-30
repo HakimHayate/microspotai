@@ -1,0 +1,989 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="micro_v2">
+    <link name="world_link">
+    </link>
+    <joint name="world_base" type="fixed">
+        <parent link="world_link" />
+        <child link="base_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+    <link name="plate">
+        <inertial>
+            <origin xyz="-0.00030703155134164994 0.0005136767792531317 -0.0016945045062295337" rpy="0.0 -0.0 0.0" />
+            <mass value="0.04864834761675765" />
+            <inertia ixx="3.575612546686329e-05" iyy="4.519227673234792e-05" izz="8.08046275677475e-05" ixy="3.59774268015197e-07" iyz="7.927868481449154e-08" ixz="-3.1024253552231724e-08" />
+        </inertial>
+        <visual name="plate_visual">
+            <origin xyz="-0.06849999999999995 -0.8425000145435343 -1.3322676295501878e-17" rpy="-1.5707963267948966 2.5243548967072383e-29 8.455473023472264e-30" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/plate.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="plate_collision">
+            <origin xyz="-0.06849999999999995 -0.8425000145435343 -1.3322676295501878e-17" rpy="-1.5707963267948966 2.5243548967072383e-29 8.455473023472264e-30" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/plate.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="B_O_shoulder">
+        <inertial>
+            <origin xyz="0.0026354218245779925 -1.1269563060523069e-10 0.012327445175848915" rpy="0.0 -0.0 0.0" />
+            <mass value="0.03377882949062915" />
+            <inertia ixx="5.3138734799928266e-05" iyy="1.4382080471056832e-05" izz="3.889752876734877e-05" ixy="3.533506773117411e-15" iyz="1.1779984628482632e-13" ixz="-4.0906015101961813e-08" />
+        </inertial>
+        <visual name="B_O_shoulder_visual">
+            <origin xyz="0.3095171245427924 -0.7784110550868545 -0.5816536026954656" rpy="6.123233995739282e-17 3.8783606848092444e-27 1.5707963267947103" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/B_O_shoulder.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="B_O_shoulder_collision">
+            <origin xyz="0.3095171245427924 -0.7784110550868545 -0.5816536026954656" rpy="6.123233995739282e-17 3.8783606848092444e-27 1.5707963267947103" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/B_O_shoulder.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="L_side_plate">
+        <inertial>
+            <origin xyz="0.011003022136216538 0.00315833165170103 -0.00010528383867878687" rpy="0.0 -0.0 0.0" />
+            <mass value="0.008907223477071244" />
+            <inertia ixx="1.2677848996993467e-05" iyy="1.3199349161902736e-05" izz="5.709795616885006e-07" ixy="-7.17396953144417e-10" iyz="1.669397557119494e-09" ixz="4.877028762499096e-10" />
+        </inertial>
+        <visual name="L_side_plate_visual">
+            <origin xyz="0.49872436103736856 -0.1741706273555746 -0.7422497832458678" rpy="1.570796326793766 6.640586315146324e-16 -1.5707963267948966" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/L_side_plate.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="L_side_plate_collision">
+            <origin xyz="0.49872436103736856 -0.1741706273555746 -0.7422497832458678" rpy="1.570796326793766 6.640586315146324e-16 -1.5707963267948966" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/L_side_plate.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="R_side_plate">
+        <inertial>
+            <origin xyz="0.011117224454488914 0.0031707064847605972 -2.130257709737293e-05" rpy="0.0 -0.0 0.0" />
+            <mass value="0.009041267710709311" />
+            <inertia ixx="1.268616524444088e-05" iyy="1.3208411939690067e-05" izz="5.725799058620293e-07" ixy="-8.333282452586449e-10" iyz="3.31362055910791e-09" ixz="-2.411749229979263e-08" />
+        </inertial>
+        <visual name="R_side_plate_visual">
+            <origin xyz="-0.3672545662197997 0.03171143945186186 -1.2347630051047214" rpy="1.5688054095786461 0.0002621076904508846 -1.5707963267948966" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/R_side_plate.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="R_side_plate_collision">
+            <origin xyz="-0.3672545662197997 0.03171143945186186 -1.2347630051047214" rpy="1.5688054095786461 0.0002621076904508846 -1.5707963267948966" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/R_side_plate.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="F_O_shoulder">
+        <inertial>
+            <origin xyz="-0.0026354218245777795 -1.2204424137962634e-11 -0.012327445175848417" rpy="0.0 -0.0 0.0" />
+            <mass value="0.03377882949062915" />
+            <inertia ixx="5.3138734799957e-05" iyy="1.4382080471111923e-05" izz="3.88975287672785e-05" ixy="-3.5134073134604608e-15" iyz="-1.1778117850135597e-13" ixz="-4.090601510154846e-08" />
+        </inertial>
+        <visual name="F_O_shoulder_visual">
+            <origin xyz="-0.30951712454231917 -0.7784110549865517 0.5816536026954644" rpy="3.141592653589793 -1.7763568394004252e-15 1.570796326795691" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/F_O_shoulder.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="F_O_shoulder_collision">
+            <origin xyz="-0.30951712454231917 -0.7784110549865517 0.5816536026954644" rpy="3.141592653589793 -1.7763568394004252e-15 1.570796326795691" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/F_O_shoulder.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_right_hip_link">
+        <inertial>
+            <origin xyz="0.025791717109692646 -0.01070711742348183 -0.012797294959447387" rpy="0.0 -0.0 0.0" />
+            <mass value="0.036864292777622265" />
+            <inertia ixx="1.280113204951225e-05" iyy="8.022630635382564e-06" izz="1.4701816001069714e-05" ixy="-3.38900758031019e-08" iyz="-2.0213446170351984e-08" ixz="-5.206499599234491e-07" />
+        </inertial>
+        <visual name="BR_hip_visual">
+            <origin xyz="-0.3880000019074402 0.19174997309449432 0.5287500546960677" rpy="1.5707963267949034 -1.5707963267947103 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_hip.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BR_hip_collision">
+            <origin xyz="-0.3880000019074402 0.19174997309449432 0.5287500546960677" rpy="1.5707963267949034 -1.5707963267947103 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_hip.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_left_hip_link">
+        <inertial>
+            <origin xyz="-0.02579171710972313 -0.010707117423481047 0.012797295059922607" rpy="0.0 -0.0 0.0" />
+            <mass value="0.036864292777622105" />
+            <inertia ixx="1.2801132049467825e-05" iyy="8.022630635389123e-06" izz="1.4701816001080664e-05" ixy="3.389007580166195e-08" iyz="2.0213446168813773e-08" ixz="-5.206499599280027e-07" />
+        </inertial>
+        <visual name="FL_hip_visual">
+            <origin xyz="-0.35400000572251394 0.19174997309449496 0.5487499454040708" rpy="1.5707963267949034 -1.570796326794102 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_hip.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FL_hip_collision">
+            <origin xyz="-0.35400000572251394 0.19174997309449496 0.5487499454040708" rpy="1.5707963267949034 -1.570796326794102 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_hip.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_right_hip_link">
+        <inertial>
+            <origin xyz="-0.025791717717073403 -0.010707075016226104 -0.01279734565474263" rpy="0.0 -0.0 0.0" />
+            <mass value="0.18779029760699154" />
+            <inertia ixx="6.521022046943135e-05" iyy="4.086805518510833e-05" izz="7.489247731826739e-05" ixy="1.7264371748540062e-07" iyz="-1.0297364182340846e-07" ixz="2.652236455739335e-06" />
+        </inertial>
+        <visual name="FR_hip_visual">
+            <origin xyz="0.06411396092153558 0.37663605012575574 -1.3602499938435155" rpy="1.5707963267948968 1.5707963267947032 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_hip.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FR_hip_collision">
+            <origin xyz="0.06411396092153558 0.37663605012575574 -1.3602499938435155" rpy="1.5707963267948968 1.5707963267947032 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_hip.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_right_thigh_link">
+        <inertial>
+            <origin xyz="-0.05503423875445398 -0.014373102260801086 -0.0035914457064525076" rpy="0.0 -0.0 0.0" />
+            <mass value="0.0832650653508372" />
+            <inertia ixx="1.3755379180083443e-05" iyy="7.647845917856404e-05" izz="7.95570328318212e-05" ixy="7.746408749240228e-06" iyz="1.8166677089113525e-07" ixz="3.4283270332945777e-06" />
+        </inertial>
+        <visual name="FR_thigh_visual">
+            <origin xyz="-0.3420999909627694 0.3179999961563798 -0.02187859322401106" rpy="-2.1347439111147616e-15 1.5707963267940945 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_thigh.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FR_thigh_collision">
+            <origin xyz="-0.3420999909627694 0.3179999961563798 -0.02187859322401106" rpy="-2.1347439111147616e-15 1.5707963267940945 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_thigh.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_right_thigh_link">
+        <inertial>
+            <origin xyz="-0.05503423235267155 0.014373093721052133 0.003591448749383837" rpy="0.0 -0.0 0.0" />
+            <mass value="0.0832650653508372" />
+            <inertia ixx="1.3755379180097971e-05" iyy="7.647845917856111e-05" izz="7.95570328317838e-05" ixy="-7.746408749243427e-06" iyz="1.8166677088940052e-07" ixz="-3.4283270333032513e-06" />
+        </inertial>
+        <visual name="BR_thigh_visual">
+            <origin xyz="-0.3420999845609882 -0.3180000046961408 0.02187859626671461" rpy="3.141592653589793 -1.57079632679471 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_thigh.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BR_thigh_collision">
+            <origin xyz="-0.3420999845609882 -0.3180000046961408 0.02187859626671461" rpy="3.141592653589793 -1.57079632679471 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_thigh.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_left_foot_link">
+        <inertial>
+            <origin xyz="-0.00999913582690219 1.1683616509827744e-08 8.110618919809909e-09" rpy="0.0 -0.0 -3.503246160812042e-46" />
+            <mass value="0.005091555527630874" />
+            <inertia ixx="8.118771456540035e-07" iyy="8.181075703660038e-07" izz="2.723635516335286e-07" ixy="-1.5576899669969117e-15" iyz="2.4831074482982922e-14" ixz="-2.361434725143043e-13" />
+        </inertial>
+        <visual name="BL_foot_visual">
+            <origin xyz="0.12951761601339057 0.16480000623156862 -0.03808131986543711" rpy="3.1415926535897705 -1.5707963267947977 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BL_foot_collision">
+            <origin xyz="0.12951761601339057 0.16480000623156862 -0.03808131986543711" rpy="3.1415926535897705 -1.5707963267947977 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_left_thigh_link">
+        <inertial>
+            <origin xyz="-0.055022268140153124 0.01437585079703596 -0.003593032353326118" rpy="0.0 -0.0 0.0" />
+            <mass value="0.08327942138020701" />
+            <inertia ixx="1.3760238525846024e-05" iyy="7.654793801580885e-05" izz="7.96289452076656e-05" ixy="-7.762194335118715e-06" iyz="-1.7959372795536312e-07" ixz="3.43731688336532e-06" />
+        </inertial>
+        <visual name="BL_thigh_visual">
+            <origin xyz="-0.02870000085583862 -0.26619999241686254 0.03492140978825759" rpy="-3.5838707263721474e-16 -1.5707963267946947 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_thigh.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BL_thigh_collision">
+            <origin xyz="-0.02870000085583862 -0.26619999241686254 0.03492140978825759" rpy="-3.5838707263721474e-16 -1.5707963267946947 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_thigh.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_left_thigh_link">
+        <inertial>
+            <origin xyz="-0.05502227072745848 0.014375845484689816 -0.0038867063587824015" rpy="0.0 -0.0 0.0" />
+            <mass value="0.08327942138020701" />
+            <inertia ixx="1.3760238525817184e-05" iyy="7.654793801580961e-05" izz="7.962894520762256e-05" ixy="-7.762194335117522e-06" iyz="-1.795937279526526e-07" ixz="3.4373168833732345e-06" />
+        </inertial>
+        <visual name="FL_thigh_visual">
+            <origin xyz="-0.0287000034431402 -0.2661999977291857 0.03462773578296968" rpy="1.4155343563304133e-15 -1.5707963267941019 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_thigh.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FL_thigh_collision">
+            <origin xyz="-0.0287000034431402 -0.2661999977291857 0.03462773578296968" rpy="1.4155343563304133e-15 -1.5707963267941019 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_thigh.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="BR_thigh_cover">
+        <inertial>
+            <origin xyz="0.0005470096329449347 0.011754599160439376 -0.06312697508520992" rpy="0.0 -0.0 -4.899199658691397e-91" />
+            <mass value="0.03893706405944291" />
+            <inertia ixx="7.540656963448149e-05" iyy="7.35269387182407e-05" izz="7.527421525060202e-06" ixy="1.3619837118143338e-06" iyz="8.461919225729008e-06" ixz="-4.219404324360147e-07" />
+        </inertial>
+        <visual name="BR_thigh_cover_visual">
+            <origin xyz="0.23585039039017897 0.16895000133514615 -0.00999999829389004" rpy="3.1415926535897927 3.6082248300320175e-14 3.141592653589607" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_thigh_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BR_thigh_cover_collision">
+            <origin xyz="0.23585039039017897 0.16895000133514615 -0.00999999829389004" rpy="3.1415926535897927 3.6082248300320175e-14 3.141592653589607" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_thigh_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="FR_thigh_cover">
+        <inertial>
+            <origin xyz="0.0005470126758902971 0.010754597700186021 -0.0631269814869923" rpy="0.0 -0.0 0.0" />
+            <mass value="0.03893706405944291" />
+            <inertia ixx="7.540656963448555e-05" iyy="7.352693871823604e-05" izz="7.527421525050444e-06" ixy="1.3619837118126533e-06" iyz="8.46191922572936e-06" ixz="-4.2194043243325e-07" />
+        </inertial>
+        <visual name="FR_thigh_cover_visual">
+            <origin xyz="0.23585039343322237 0.1679499998747484 -0.010000004695680756" rpy="3.141592653589791 5.551115124249123e-17 3.1415926535889946" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_thigh_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FR_thigh_cover_collision">
+            <origin xyz="0.23585039343322237 0.1679499998747484 -0.010000004695680756" rpy="3.141592653589791 5.551115124249123e-17 3.1415926535889946" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_thigh_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="BL_thigh_cover">
+        <inertial>
+            <origin xyz="0.002297180533353327 0.013754598822338676 0.06312661207834062" rpy="0.0 -0.0 4.044959930609739e-59" />
+            <mass value="0.03893713941223777" />
+            <inertia ixx="7.540655713665292e-05" iyy="7.352694801837439e-05" izz="7.527452668841875e-06" ixy="1.3619473645322161e-06" iyz="-8.461905323916798e-06" ixz="4.2190684021594467e-07" />
+        </inertial>
+        <visual name="BL_thigh_cover_visual">
+            <origin xyz="-0.09633812733751498 -0.21714999165394921 -0.5898212729478838" rpy="-3.0287592142310507e-16 -9.342526752220434e-14 1.8646195698579406e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_thigh_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BL_thigh_cover_collision">
+            <origin xyz="-0.09633812733751498 -0.21714999165394921 -0.5898212729478838" rpy="-3.0287592142310507e-16 -9.342526752220434e-14 1.8646195698579406e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_thigh_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="FL_thigh_cover">
+        <inertial>
+            <origin xyz="0.0022971865055372476 0.015154587787950664 0.06362661466564508" rpy="0.0 -0.0 2.242077542919708e-44" />
+            <mass value="0.03893713941223777" />
+            <inertia ixx="7.540655713659261e-05" iyy="7.352694801848416e-05" izz="7.527452668833308e-06" ixy="1.361947364536607e-06" iyz="-8.461905323919561e-06" ixz="4.2190684021147223e-07" />
+        </inertial>
+        <visual name="FL_thigh_cover_visual">
+            <origin xyz="-0.09633812136526486 -0.21575000268839659 -0.589321270360568" rpy="1.2490009027144676e-15 2.0594637106807856e-14 7.947670299657368e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_thigh_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FL_thigh_cover_collision">
+            <origin xyz="-0.09633812136526486 -0.21575000268839659 -0.589321270360568" rpy="1.2490009027144676e-15 2.0594637106807856e-14 7.947670299657368e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_thigh_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_left_knee_link">
+        <inertial>
+            <origin xyz="0.0015749250993899188 -0.052993312017392234 -0.02286236993013203" rpy="0.0 -0.0 0.0" />
+            <mass value="0.04324553544795635" />
+            <inertia ixx="0.00010152448088774171" iyy="6.4944535346169894e-06" izz="0.00010208552527208627" ixy="-6.225038914841729e-06" iyz="-4.4702999463025125e-06" ixz="-5.174743024211319e-07" />
+        </inertial>
+        <visual name="BL_knee_visual">
+            <origin xyz="-0.23500000351603445 0.23920739886636674 -0.13539999936509906" rpy="-1.5707963267949623 9.957992499703075e-17 -1.5707963267949907" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BL_knee_collision">
+            <origin xyz="-0.23500000351603445 0.23920739886636674 -0.13539999936509906" rpy="-1.5707963267949623 9.957992499703075e-17 -1.5707963267949907" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_left_knee_link">
+        <inertial>
+            <origin xyz="0.0015749281999098842 -0.05299330449250833 -0.022862370964527444" rpy="0.0 -1.8669045833583475e-60 0.0" />
+            <mass value="0.04324553544795635" />
+            <inertia ixx="0.00010152448088773954" iyy="6.494453534611785e-06" izz="0.00010208552527209586" ixy="-6.2250389148300195e-06" iyz="-4.47029994630891e-06" ixz="-5.174743024218368e-07" />
+        </inertial>
+        <visual name="FL_knee_visual">
+            <origin xyz="-0.2350000004154507 0.23920740639122337 -0.13540000039969757" rpy="-1.5707963267941014 1.5681900439927421e-15 -1.5707963267948761" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FL_knee_collision">
+            <origin xyz="-0.2350000004154507 0.23920740639122337 -0.13540000039969757" rpy="-1.5707963267941014 1.5681900439927421e-15 -1.5707963267948761" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_right_knee_link">
+        <inertial>
+            <origin xyz="0.0015749303880066457 -0.05299330586541675 0.022862368748257485" rpy="0.0 -0.0 0.0" />
+            <mass value="0.043245535305863364" />
+            <inertia ixx="0.00010152448077776501" iyy="6.494453514850032e-06" izz="0.00010208552516261416" ixy="-6.225038883996394e-06" iyz="4.470299912248915e-06" ixz="5.174742937599829e-07" />
+        </inertial>
+        <visual name="FR_knee_visual">
+            <origin xyz="-0.21777207958176376 0.04550000379663741 0.32700001189200534" rpy="-1.5707963267947087 2.2873995781525403e-15 -1.5707963267948266" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FR_knee_collision">
+            <origin xyz="-0.21777207958176376 0.04550000379663741 0.32700001189200534" rpy="-1.5707963267947087 2.2873995781525403e-15 -1.5707963267948266" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="B_I_shoulder">
+        <inertial>
+            <origin xyz="0.03611851677962905 -0.0014871507207726187 -0.03899990260998381" rpy="0.0 -0.0 0.0" />
+            <mass value="0.08589743647055091" />
+            <inertia ixx="0.00010226041444697033" iyy="7.249520221006185e-05" izz="7.563778878047576e-05" ixy="7.646528161576365e-06" iyz="-3.6884099598384725e-10" ixz="8.306628789821618e-11" />
+        </inertial>
+        <visual name="B_I_shoulder_visual">
+            <origin xyz="0.05250000000002176 -0.42012988310373195 0.15111435319933908" rpy="-1.5707963267950316 1.5707963267947103 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/B_I_shoulder.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="B_I_shoulder_collision">
+            <origin xyz="0.05250000000002176 -0.42012988310373195 0.15111435319933908" rpy="-1.5707963267950316 1.5707963267947103 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/B_I_shoulder.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="F_I_shoulder">
+        <inertial>
+            <origin xyz="-0.03611851677962818 -0.0014871445606310686 0.03899989948305" rpy="0.0 -0.0 0.0" />
+            <mass value="0.08589743647055091" />
+            <inertia ixx="0.0001022604144469258" iyy="7.249520221006337e-05" izz="7.563778878046502e-05" ixy="-7.646528161568369e-06" iyz="3.6884099032761156e-10" ixz="8.306630281125113e-11" />
+        </inertial>
+        <visual name="F_I_shoulder_visual">
+            <origin xyz="-0.052499999999792366 -0.4201298769435946 -0.15111435632628353" rpy="-1.5707963267947618 -1.5707963267941023 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/F_I_shoulder.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="F_I_shoulder_collision">
+            <origin xyz="-0.052499999999792366 -0.4201298769435946 -0.15111435632628353" rpy="-1.5707963267947618 -1.5707963267941023 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/F_I_shoulder.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="T_cover">
+        <inertial>
+            <origin xyz="-0.0911576303917096 0.02021033518016951 0.0013125204760587829" rpy="0.0 -0.0 3.745632277521685e-70" />
+            <mass value="0.06005309462252172" />
+            <inertia ixx="9.137761665754363e-05" iyy="8.884812241765007e-05" izz="0.00017063302366002376" ixy="-1.0385019928602134e-07" iyz="3.014326782803383e-07" ixz="-2.194218347469135e-06" />
+        </inertial>
+        <visual name="T_cover_visual">
+            <origin xyz="-1.4718272718899608 0.5899999817361661 -1.0767499430709717" rpy="1.5707963267948966 -1.3486434191632203e-13 -1.86220313404333e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/T_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="T_cover_collision">
+            <origin xyz="-1.4718272718899608 0.5899999817361661 -1.0767499430709717" rpy="1.5707963267948966 -1.3486434191632203e-13 -1.86220313404333e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/T_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="B_cover">
+        <inertial>
+            <origin xyz="0.09234199578295221 0.004905447566338418 -0.006916622704367639" rpy="0.0 -0.0 0.0" />
+            <mass value="0.059407825114151616" />
+            <inertia ixx="9.840669232749635e-05" iyy="8.277048026674587e-05" izz="0.00016700758252279798" ixy="2.7552289512741482e-08" iyz="-1.492277481511595e-07" ixz="3.626403860662668e-06" />
+        </inertial>
+        <visual name="B_cover_visual">
+            <origin xyz="0.02134494141659726 0.0028115488098948505 0.0022622917087028417" rpy="-1.570796326794895 2.1351305120120623e-13 7.943841730960351e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/B_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="B_cover_collision">
+            <origin xyz="0.02134494141659726 0.0028115488098948505 0.0022622917087028417" rpy="-1.570796326794895 2.1351305120120623e-13 7.943841730960351e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/B_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="F_cover">
+        <inertial>
+            <origin xyz="-0.0384615355349497 -0.01999996097784608 -0.02741487358977392" rpy="0.0 -0.0 0.0" />
+            <mass value="0.0692881513544626" />
+            <inertia ixx="0.00012370329165611307" iyy="7.440589630172212e-05" izz="0.00010330102660546358" ixy="1.4615079907091198e-10" iyz="-1.4121808334329688e-10" ixz="4.9259358198498054e-06" />
+        </inertial>
+        <visual name="F_cover_visual">
+            <origin xyz="0.3366348488170215 -0.5899999586356667 0.31790000739478635" rpy="3.1415926535897913 -1.1612032524853746e-27 3.1415926535889986" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/F_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="F_cover_collision">
+            <origin xyz="0.3366348488170215 -0.5899999586356667 0.31790000739478635" rpy="3.1415926535897913 -1.1612032524853746e-27 3.1415926535889986" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/F_cover.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_right_foot_link">
+        <inertial>
+            <origin xyz="-0.009999141208103133 1.4159365946397884e-08 4.418976828901578e-09" rpy="0.0 -0.0 0.0" />
+            <mass value="0.005091555527630878" />
+            <inertia ixx="8.1187714565357e-07" iyy="8.181075703662748e-07" izz="2.723635516334068e-07" ixy="-1.557649467167365e-15" iyz="2.483098763073239e-14" ixz="-2.3614339474609184e-13" />
+        </inertial>
+        <visual name="FR_foot_visual">
+            <origin xyz="0.12951761063218126 0.16480000870732092 -0.03808132355709784" rpy="-3.141592653589731 -1.5707963267947054 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FR_foot_collision">
+            <origin xyz="0.12951761063218126 0.16480000870732092 -0.03808132355709784" rpy="-3.141592653589731 -1.5707963267947054 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FR_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_left_foot_link">
+        <inertial>
+            <origin xyz="-0.009999139213195143 1.2718010395929014e-08 6.043613929307412e-09" rpy="-2.2420775429197068e-44 -5.5511151231257815e-17 -4.4841550858394136e-44" />
+            <mass value="0.005091555527630874" />
+            <inertia ixx="8.118771456534586e-07" iyy="8.181075703664917e-07" izz="2.72363551633125e-07" ixy="-1.5576727370399756e-15" iyz="2.483060669817939e-14" ixz="-2.36143324707055e-13" />
+        </inertial>
+        <visual name="FL_foot_visual">
+            <origin xyz="0.12951761262705208 0.1648000072659727 -0.03808132193256455" rpy="-3.1415926535895227 -1.5707963267941487 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="FL_foot_collision">
+            <origin xyz="0.12951761262705208 0.1648000072659727 -0.03808132193256455" rpy="-3.1415926535895227 -1.5707963267941487 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/FL_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_right_end_foot_dummy">
+        <inertial>
+            <origin xyz="-0.2439999975309589 0.018994995303857305 0.012000004535252833" rpy="0.0 -0.0 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.864684362272585e-13" iyy="1.972920176644342e-12" izz="9.86468181410962e-13" ixy="-3.308722450212111e-24" iyz="2.509768135873801e-42" ixz="-6.284512722864113e-51" />
+        </inertial>
+        <visual name="back_right_end_foot_dummy_visual">
+            <origin xyz="-0.2439999975309589 0.018999995303857313 0.012000004535461973" rpy="1.5707963267948966 1.57079632679471 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/back_right_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="back_right_end_foot_dummy_collision">
+            <origin xyz="-0.2439999975309589 0.018999995303857313 0.012000004535461973" rpy="1.5707963267948966 1.57079632679471 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/back_right_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_left_end_foot_dummy">
+        <inertial>
+            <origin xyz="-0.24400000268020183 0.01900499540432859 -0.011999997067646451" rpy="0.0 -0.0 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.864684362256041e-13" iyy="1.9729201766575768e-12" izz="9.86468181424197e-13" ixy="4.070158662375895e-53" iyz="-3.6404323243587524e-41" ixz="-3.308722450212111e-24" />
+        </inertial>
+        <visual name="front_left_end_foot_dummy_visual">
+            <origin xyz="-0.24400000268020183 0.018999995404328587 -0.01199999706785558" rpy="-1.5707963267948948 -1.57079632679471 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_left_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="front_left_end_foot_dummy_collision">
+            <origin xyz="-0.24400000268020183 0.018999995404328587 -0.01199999706785558" rpy="-1.5707963267948948 -1.57079632679471 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_left_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_right_end_foot_dummy_1">
+        <inertial>
+            <origin xyz="-0.2439999996492761 -0.01899500384357882 -0.012000001323985786" rpy="1.1210387714598537e-44 -4.379057701015054e-47 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.86468436222295e-13" iyy="1.972920176657576e-12" izz="9.86468181424197e-13" ixy="-8.511331270457783e-44" iyz="-9.7962787303462e-41" ixz="-3.3087224502121103e-24" />
+        </inertial>
+        <visual name="front_right_end_foot_dummy_visual">
+            <origin xyz="-0.2439999996492761 -0.01900000384357883 -0.012000001324194915" rpy="-1.5707963267948948 -1.5707963267947103 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_right_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="front_right_end_foot_dummy_collision">
+            <origin xyz="-0.2439999996492761 -0.01900000384357883 -0.012000001324194915" rpy="-1.5707963267948948 -1.5707963267947103 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_right_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_right_end_foot_dummy">
+        <inertial>
+            <origin xyz="-0.2439999996492761 -0.01899500384357882 -0.012000001323985786" rpy="1.1210387714598537e-44 -4.379057701015054e-47 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.86468436222295e-13" iyy="1.972920176657576e-12" izz="9.86468181424197e-13" ixy="-8.511331270457783e-44" iyz="-9.7962787303462e-41" ixz="-3.3087224502121103e-24" />
+        </inertial>
+        <visual name="front_right_end_foot_dummy_visual">
+            <origin xyz="-0.2439999996492761 -0.01900000384357883 -0.012000001324194915" rpy="-1.5707963267948948 -1.5707963267947103 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_right_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="front_right_end_foot_dummy_collision">
+            <origin xyz="-0.2439999996492761 -0.01900000384357883 -0.012000001324194915" rpy="-1.5707963267948948 -1.5707963267947103 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_right_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="front_right_end_foot_dummy_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+        <parent link="front_right_end_foot_dummy_1" />
+        <child link="front_right_end_foot_dummy" />
+    </joint>
+    <link name="back_left_end_foot_dummy">
+        <inertial>
+            <origin xyz="-0.2440000000928956 0.019005000716673194 -0.011999998507234712" rpy="0.0 -0.0 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.864684362256041e-13" iyy="1.9729201766575768e-12" izz="9.86468181410962e-13" ixy="-3.308722450212111e-24" iyz="-1.6543612251060552e-24" ixz="-6.225491068885625e-42" />
+        </inertial>
+        <visual name="back_left_end_foot_dummy_visual">
+            <origin xyz="-0.2440000000928956 0.019000000716673186 -0.011999998507443852" rpy="-1.5707963267948968 -1.5707963267946945 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/back_left_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="back_left_end_foot_dummy_collision">
+            <origin xyz="-0.2440000000928956 0.019000000716673186 -0.011999998507443852" rpy="-1.5707963267948968 -1.5707963267946945 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/back_left_end_foot_dummy.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_right_end_foot">
+        <inertial>
+            <origin xyz="-1.3239857743485572e-09 -4.996156421164244e-06 3.5072389437118545e-10" rpy="0.0 -0.0 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.86468181424197e-13" iyy="1.9729201766575768e-12" izz="9.864684362222954e-13" ixy="0.0" iyz="0.0" ixz="-3.308722450212111e-24" />
+        </inertial>
+        <visual name="front_right_end_foot_visual">
+            <origin xyz="-1.3241949048392598e-09 3.843578841866702e-09 3.5072389437118545e-10" rpy="1.5707963267948986 4.694093751090049e-16 -1.863786902589471e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_right_end_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="front_right_end_foot_collision">
+            <origin xyz="-1.3241949048392598e-09 3.843578841866702e-09 3.5072389437118545e-10" rpy="1.5707963267948986 4.694093751090049e-16 -1.863786902589471e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_right_end_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_left_end_foot">
+        <inertial>
+            <origin xyz="1.4927652891572052e-09 -5.0007166731980135e-06 -9.289557567626616e-11" rpy="0.0 -0.0 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.86468181410962e-13" iyy="1.9729201766575768e-12" izz="9.864684362256041e-13" ixy="1.6543612251060553e-24" iyz="3.308722450212111e-24" ixz="-1.883564624590832e-41" />
+        </inertial>
+        <visual name="back_left_end_foot_visual">
+            <origin xyz="1.4925561497847185e-09 -7.16673191902828e-10 -9.289557567626616e-11" rpy="1.5707963267948966 7.795725530521561e-14 -1.863786902589471e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/back_left_end_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="back_left_end_foot_collision">
+            <origin xyz="1.4925561497847185e-09 -7.16673191902828e-10 -9.289557567626616e-11" rpy="1.5707963267948966 7.795725530521561e-14 -1.863786902589471e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/back_left_end_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_right_end_foot">
+        <inertial>
+            <origin xyz="-4.535252839943382e-09 -5.004696142698606e-06 2.4690410782568507e-09" rpy="0.0 -0.0 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.86468181410962e-13" iyy="1.972920176644342e-12" izz="9.864684362272585e-13" ixy="-2.781216413904193e-54" iyz="-3.308722450212111e-24" ixz="1.6583934697261403e-42" />
+        </inertial>
+        <visual name="back_right_end_foot_visual">
+            <origin xyz="-4.535461979315869e-09 -4.696142692495187e-09 2.4690410782568507e-09" rpy="1.5707963267948966 -6.863783776144687e-15 -1.863786902589471e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/back_right_end_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="back_right_end_foot_collision">
+            <origin xyz="-4.535461979315869e-09 -4.696142692495187e-09 2.4690410782568507e-09" rpy="1.5707963267948966 -6.863783776144687e-15 -1.863786902589471e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/back_right_end_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="front_left_end_foot">
+        <inertial>
+            <origin xyz="2.932353542206556e-09 -4.995404328589359e-06 -2.6802018027183294e-09" rpy="0.0 -0.0 0.0" />
+            <mass value="9.864601226263686e-07" />
+            <inertia ixx="9.86468181424197e-13" iyy="1.9729201766575768e-12" izz="9.864684362256041e-13" ixy="0.0" iyz="0.0" ixz="-3.308722450212111e-24" />
+        </inertial>
+        <visual name="front_left_end_foot_visual">
+            <origin xyz="2.9321444117158536e-09 4.595671416751657e-09 -2.6802018027183294e-09" rpy="1.5707963267948983 -6.863783776154407e-15 -1.8637869025894712e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_left_end_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="front_left_end_foot_collision">
+            <origin xyz="2.9321444117158536e-09 4.595671416751657e-09 -2.6802018027183294e-09" rpy="1.5707963267948983 -6.863783776154407e-15 -1.8637869025894712e-13" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/front_left_end_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_right_knee_link">
+        <inertial>
+            <origin xyz="0.0015749309584185234 -0.052993310844657845 0.022862372568523543" rpy="0.0 2.939468408801146e-51 0.0" />
+            <mass value="0.043245535305863364" />
+            <inertia ixx="0.00010152448077778756" iyy="6.4944535148511165e-06" izz="0.00010208552516260375" ixy="-6.2250388840042e-06" iyz="4.47029991224512e-06" ixz="5.174742937619887e-07" />
+        </inertial>
+        <visual name="BR_knee_visual">
+            <origin xyz="-0.21777207901153467 0.04549999881740422 0.3270000157121361" rpy="-1.5707963267940963 5.020348389783546e-16 -1.5707963267948606" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BR_knee_collision">
+            <origin xyz="-0.21777207901153467 0.04549999881740422 0.3270000157121361" rpy="-1.5707963267940963 5.020348389783546e-16 -1.5707963267948606" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_right_foot_link">
+        <inertial>
+            <origin xyz="-0.009999136685224634 1.0339098057698949e-08 2.1657671389618827e-09" rpy="0.0 -0.0 0.0" />
+            <mass value="0.005091555527630874" />
+            <inertia ixx="8.118771456537742e-07" iyy="8.181075703661664e-07" izz="2.723635516346119e-07" ixy="-1.5576368256214697e-15" iyz="2.483066573897733e-14" ixz="-2.361430633973908e-13" />
+        </inertial>
+        <visual name="BR_foot_visual">
+            <origin xyz="0.12951761515502203 0.16480000488706018 -0.038081325810411994" rpy="-3.14159265358952 -1.5707963267941443 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BR_foot_collision">
+            <origin xyz="0.12951761515502203 0.16480000488706018 -0.038081325810411994" rpy="-3.14159265358952 -1.5707963267941443 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BR_foot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="base_link">
+        <inertial>
+            <origin xyz="0.00014512349910911007 -2.079349644076967e-06 0.0005000000000000045" rpy="0.0 0.0 0.0" />
+            <mass value="0.0011498212283591065" />
+            <inertia ixx="1.3498171051334757e-08" iyy="1.3498174513094266e-08" izz="2.6804708693035836e-08" ixy="1.2945851165175464e-23" iyz="-5.555600256673289e-25" ixz="-7.625571271973224e-25" />
+        </inertial>
+        <visual name="base_link_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/base_link.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="base_link_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/base_link.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="back_left_hip_link">
+        <inertial>
+            <origin xyz="0.02579171771709058 -0.010707081176380282 0.012797342527842322" rpy="0.0 -0.0 0.0" />
+            <mass value="0.0368643119251431" />
+            <inertia ixx="1.2801140094796862e-05" iyy="8.022633508447902e-06" izz="1.4701822617496846e-05" ixy="-3.3890951394036024e-08" iyz="2.0214316184292432e-08" ixz="5.206492201554204e-07" />
+        </inertial>
+        <visual name="BL_hip_visual">
+            <origin xyz="0.04912500000003467 -0.03167021691821325 -0.23938451550890633" rpy="1.5707963267948188 -1.5707963267947105 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_hip.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="BL_hip_collision">
+            <origin xyz="0.04912500000003467 -0.03167021691821325 -0.23938451550890633" rpy="1.5707963267948188 -1.5707963267947105 0" />
+            <geometry>
+                <mesh filename="package://microspot_description/meshes/BL_hip.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="plate_Rigid-3" type="fixed">
+        <origin xyz="0.0535 0.0 -0.0029" rpy="-9.466330862652142e-30 1.401298464324817e-45 0.0" />
+        <parent link="plate" />
+        <child link="B_O_shoulder" />
+    </joint>
+    <joint name="plate_Rigid-6" type="fixed">
+        <origin xyz="-0.0535 0.0 -0.0029" rpy="3.141592653589793 1.401298464324817e-45 0.0" />
+        <parent link="plate" />
+        <child link="F_O_shoulder" />
+    </joint>
+    <joint name="back_right_hip_joint" type="revolute">
+        <origin xyz="0.005 0.03900001 0.02200001" rpy="1.5707963267948966 -1.401298464324817e-45 -2.380607455192557e-43" />
+        <parent link="B_O_shoulder" />
+        <child link="back_right_hip_link" />
+        <axis xyz="1.0 -7.174648137343064e-43 2.476024023201024e-43" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="front_left_hip_joint" type="revolute">
+        <origin xyz="-0.005 0.03900001 -0.02200001" rpy="-1.5707963267948966 1.401298464324817e-45 -1.0108296635416495e-28" />
+        <parent link="F_O_shoulder" />
+        <child link="front_left_hip_link" />
+        <axis xyz="-1.0 1.9721522630525295e-31 -1.0088794678863922e-28" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="front_right_hip_joint" type="revolute">
+        <origin xyz="-0.005 -0.039 -0.022" rpy="-1.5707963267948966 1.401298464324817e-45 -1.0108296635416495e-28" />
+        <parent link="F_O_shoulder" />
+        <child link="front_right_hip_link" />
+        <axis xyz="-1.0 1.9721522630525295e-31 -1.0088794678863922e-28" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="BR_thigh_Rigid-17" type="fixed">
+        <origin xyz="0.015300000000000001 0.01980816000000001 0.0007063299999999906" rpy="7.888609052210118e-31 1.5707963267948966 0" />
+        <parent link="back_right_thigh_link" />
+        <child link="BR_thigh_cover" />
+    </joint>
+    <joint name="FR_thigh_Rigid-18" type="fixed">
+        <origin xyz="0.015300000000000003 -0.019808169999999993 -0.0007063299999999906" rpy="3.141592653589793 -1.5707963267948966 0" />
+        <parent link="front_right_thigh_link" />
+        <child link="FR_thigh_cover" />
+    </joint>
+    <joint name="back_left_knee_joint" type="revolute">
+        <origin xyz="-0.011798460000000004 0.02635000999999999 0.12592483999999998" rpy="-1.5707963267948966 1.262177448353619e-29 5.6500320332286374e-30" />
+        <parent link="BL_thigh_cover" />
+        <child link="back_left_knee_link" />
+        <axis xyz="8.23885917218454e-30 -0.0 1.0" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="plate_Rigid-34" type="fixed">
+        <origin xyz="0.0 0.0475 -0.0029" rpy="-0.0 -1.5707963267948966 0" />
+        <parent link="plate" />
+        <child link="R_side_plate" />
+    </joint>
+    <joint name="plate_Rigid-35" type="fixed">
+        <origin xyz="0.0 -0.0475 -0.0029" rpy="-3.141592653589793 -1.5707963267948966 0" />
+        <parent link="plate" />
+        <child link="L_side_plate" />
+    </joint>
+    <joint name="F_I_shoulder_Rigid-38" type="fixed">
+        <origin xyz="-0.030999990000000005 0.023999999999999994 0.01899998" rpy="-1.5707963267948966 -3.7727574903644544e-29 -1.0899099269528308e-61" />
+        <parent link="F_I_shoulder" />
+        <child link="F_cover" />
+    </joint>
+    <joint name="BL_thigh_Rigid-48" type="fixed">
+        <origin xyz="0.015300000000000001 0.016900000000000005 0.00029367999999999837" rpy="3.204747427460358e-30 -1.5707963267948966 0" />
+        <parent link="back_left_thigh_link" />
+        <child link="BL_thigh_cover" />
+    </joint>
+    <joint name="FL_thigh_Rigid-50" type="fixed">
+        <origin xyz="0.015299999999999998 0.015 -0.0004999999999999894" rpy="3.921977907224805e-58 -1.5707963267948966 0" />
+        <parent link="front_left_thigh_link" />
+        <child link="FL_thigh_cover" />
+    </joint>
+    <joint name="front_left_knee_joint" type="revolute">
+        <origin xyz="-0.011798510000000012 0.027750000000000004 0.12642447" rpy="-1.5707963267948966 3.1554436208840472e-30 -8.148686631961902e-29" />
+        <parent link="FL_thigh_cover" />
+        <child link="front_left_knee_link" />
+        <axis xyz="2.9152416381181396e-29 0.0 1.0000000000000002" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="front_right_knee_joint" type="revolute">
+        <origin xyz="-0.013547740000000008 0.027349999999999996 -0.12592474" rpy="1.5707963267948966 -0.0 2.3264108345322623e-30" />
+        <parent link="FR_thigh_cover" />
+        <child link="front_right_knee_link" />
+        <axis xyz="-1.1850209211729491e-31 0.0 -1.0" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="front_right_foot_joint" type="fixed">
+        <origin xyz="3.9930000000012454e-05 -0.11648545999999999 0.02540000000000001" rpy="-1.5707963267948966 1.2422292627523262e-28 1.91986255555266" />
+        <parent link="front_right_knee_link" />
+        <child link="front_right_foot_link" />
+    </joint>
+    <joint name="front_left_foot_joint" type="fixed">
+        <origin xyz="3.993000000000358e-05 -0.11648547000000001 -0.025399999999999992" rpy="-1.5707963267948966 3.056989884331923e-31 1.91986255555266" />
+        <parent link="front_left_knee_link" />
+        <child link="front_left_foot_link" />
+    </joint>
+    <joint name="back_left_foot_joint" type="fixed">
+        <origin xyz="3.993000000000358e-05 -0.11648547000000001 -0.025399999999999992" rpy="-1.5707963267948966 3.056989884331923e-31 1.91986255555266" />
+        <parent link="back_left_knee_link" />
+        <child link="back_left_foot_link" />
+    </joint>
+    <joint name="B_I_shoulder_Rigid-58" type="fixed">
+        <origin xyz="0.03099996000000001 0.024000000000000004 -0.018999910000000002" rpy="-1.5707963267948966 -2.524354896654774e-29 7.89211295107737e-42" />
+        <parent link="B_I_shoulder" />
+        <child link="T_cover" />
+    </joint>
+    <joint name="F_I_shoulder_Rigid-59" type="fixed">
+        <origin xyz="-0.031000040000000003 -0.042 0.033999949999999994" rpy="1.5707963267948966 -3.7727574903644544e-29 -1.0899099269528308e-61" />
+        <parent link="F_I_shoulder" />
+        <child link="B_cover" />
+    </joint>
+    <joint name="F_O_shoulder_Rigid-61" type="fixed">
+        <origin xyz="-0.005 -0.039 -0.022" rpy="-1.5707963267948966 1.401298464324817e-45 -1.0108296635416495e-28" />
+        <parent link="F_O_shoulder" />
+        <child link="F_I_shoulder" />
+    </joint>
+    <joint name="B_O_shoulder_Rigid-62" type="fixed">
+        <origin xyz="0.005 -0.03900003 0.021999969999999997" rpy="1.5707963267948966 -1.401298464324817e-45 -2.380607455192557e-43" />
+        <parent link="B_O_shoulder" />
+        <child link="B_I_shoulder" />
+    </joint>
+    <joint name="back_right_knee_joint" type="revolute">
+        <origin xyz="-0.013547980000000006 0.024349999999999986 -0.12592446" rpy="1.5707963267948966 -5.5220263365470826e-30 -1.3393690751206436e-29" />
+        <parent link="BR_thigh_cover" />
+        <child link="back_right_knee_link" />
+        <axis xyz="1.260641971940925e-29 4.657773615960864e-22 -1.0" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="back_right_foot_joint" type="fixed">
+        <origin xyz="3.993000000000358e-05 -0.11648547000000001 0.025399999999999992" rpy="-1.5707963267948966 4.376876407426607e-22 1.91986255555266" />
+        <parent link="back_right_knee_link" />
+        <child link="back_right_foot_link" />
+    </joint>
+    <joint name="back_left_hip_joint" type="revolute">
+        <origin xyz="0.005 -0.03900003 0.021999969999999997" rpy="1.5707963267948966 -1.401298464324817e-45 -2.380607455192557e-43" />
+        <parent link="B_O_shoulder" />
+        <child link="back_left_hip_link" />
+        <axis xyz="1.0 -7.174648137343064e-43 2.5243548967072624e-29" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="back_left_thigh_joint" type="revolute">
+        <origin xyz="0.02424988000000001 -0.010749789999999999 0.02749999" rpy="1.5707963267948966 -3.0044506389506065e-32 1.5707963267948966" />
+        <parent link="back_left_hip_link" />
+        <child link="back_left_thigh_link" />
+        <axis xyz="0.0 1.0 9.143468434891569e-29" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="back_right_thigh_joint" type="revolute">
+        <origin xyz="0.024249820000000002 -0.010749930000000001 -0.02749995" rpy="-1.5707963267948966 8.2044615704831e-31 1.5707963267948966" />
+        <parent link="back_right_hip_link" />
+        <child link="back_right_thigh_link" />
+        <axis xyz="7.888609052210118e-31 1.0 8.480698820897446e-31" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="front_right_thigh_joint" type="revolute">
+        <origin xyz="-0.02424988000000001 -0.010749779999999999 -0.027499990000000002" rpy="1.5707963267948966 -1.2624663378276273e-29 1.5707963267948966" />
+        <parent link="front_right_hip_link" />
+        <child link="front_right_thigh_link" />
+        <axis xyz="-1.262177448353619e-29 -1.0 -2.4888484054377715e-28" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="front_left_thigh_joint" type="revolute">
+        <origin xyz="-0.02425033000000001 -0.010750350000000002 0.02749995" rpy="1.5707963267948966 -2.888894740084509e-33 1.5707963267948966" />
+        <parent link="front_left_hip_link" />
+        <child link="front_left_thigh_link" />
+        <axis xyz="-0.0 1.0 -1.230129974081141e-29" />
+        <limit lower="-1.570796" upper="1.570796" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="base_link_Rigid-72" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+        <parent link="base_link" />
+        <child link="plate" />
+    </joint>
+    <joint name="BR_hip_Rigid-81" type="fixed">
+        <origin xyz="0.024249820000000002 -0.010749930000000001 -0.02749995" rpy="-1.5707963267948966 8.2044615704831e-31 1.5707963267948966" />
+        <parent link="back_right_hip_link" />
+        <child link="back_right_end_foot_dummy" />
+    </joint>
+    <joint name="FL_hip_Rigid-82" type="fixed">
+        <origin xyz="-0.02425033000000001 -0.010750350000000002 0.02749995" rpy="1.5707963267948966 -2.888894740084509e-33 1.5707963267948966" />
+        <parent link="front_left_hip_link" />
+        <child link="front_left_end_foot_dummy" />
+    </joint>
+    <joint name="FR_hip_Rigid-83" type="fixed">
+        <origin xyz="-0.024250039999999997 -0.01075005 -0.027499990000000002" rpy="1.5707963267948966 4.6414911836228734e-32 1.5707963267948966" />
+        <parent link="front_right_hip_link" />
+        <child link="front_right_end_foot_dummy_1" />
+    </joint>
+    <joint name="BL_hip_Rigid-84" type="fixed">
+        <origin xyz="0.02424988000000001 -0.010749789999999999 0.02749999" rpy="1.5707963267948966 -3.0044506389506065e-32 1.5707963267948966" />
+        <parent link="back_left_hip_link" />
+        <child link="back_left_end_foot_dummy" />
+    </joint>
+    <joint name="front_right_end_foot_dummy_Rigid-85" type="fixed">
+        <origin xyz="-0.244 -0.018999999999999986 -0.01200000000000001" rpy="-3.141592653589793 -1.5707963267948966 0" />
+        <parent link="front_right_end_foot_dummy_1" />
+        <child link="front_right_end_foot" />
+    </joint>
+    <joint name="back_left_end_foot_dummy_Rigid-86" type="fixed">
+        <origin xyz="-0.24400000000000002 0.018999999999999996 -0.012000000000000002" rpy="-3.141592653589793 -1.5707963267948966 0" />
+        <parent link="back_left_end_foot_dummy" />
+        <child link="back_left_end_foot" />
+    </joint>
+    <joint name="back_right_end_foot_dummy_Rigid-87" type="fixed">
+        <origin xyz="-0.244 0.019000000000000003 0.011999999999999993" rpy="7.888609052210118e-31 1.5707963267948966 0" />
+        <parent link="back_right_end_foot_dummy" />
+        <child link="back_right_end_foot" />
+    </joint>
+    <joint name="front_left_end_foot_dummy_Rigid-88" type="fixed">
+        <origin xyz="-0.24400000000000002 0.019000000000000003 -0.011999999999999993" rpy="3.141592653589793 -1.5707963267948966 0" />
+        <parent link="front_left_end_foot_dummy" />
+        <child link="front_left_end_foot" />
+    </joint>
+</robot>

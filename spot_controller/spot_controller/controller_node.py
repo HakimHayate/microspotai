@@ -14,6 +14,11 @@ from scipy.spatial.transform import Rotation as R
 from utils import quaternion_to_rpy
 from gui_controller import AppGUI
 from arm_controller import ArmController
+from ament_index_python.packages import get_package_share_directory
+import os
+import pinocchio as pin
+
+
 
 class ControllerNode(Node):
     """The ROS 2 Node logic"""
@@ -50,8 +55,16 @@ class ControllerNode(Node):
 
         self.tf_buffer_ = Buffer()
         self.tf_listener_ = TransformListener(self.tf_buffer_, self)
+        pkg_share = get_package_share_directory('microspot_description')
+        urdf_file = os.path.join(pkg_share, 'urdf', 'micro_v2.urdf')
 
-        self.body_controller_ = BodyController(self, self.joint_names_, self.links_, defaultZ= self.defaultZ_)
+        with open(urdf_file, 'r') as infp:
+            robot_desc = infp.read()
+
+        self.model_ = pin.buildModelFromXML(robot_desc)
+        self.data_ = self.model_.createData()
+
+        self.body_controller_ = BodyController(self.model_, self.data_, self.links_)
         self.gait_controller_ = GaitController()
         self.stabilizer_ = None
         self.timer_ = self.create_timer(0.01, self.control_loop)
@@ -62,10 +75,9 @@ class ControllerNode(Node):
                                               '/imu/data',
                                               self.imu_callback,
                                               10)
-        self.T_world_foot_ = {}
-        self.T_base_thigh_ = {}
+        
         self.T_world_base_ = np.eye(4)
-        self.thigh_foot_ = None # In thigh frame
+        self.thigh_foot_ = None # In world frame
 
         self.imu_last_data_ = None
 
@@ -75,8 +87,12 @@ class ControllerNode(Node):
             self.arm_pose_callback,
             10
         )
-        self.body_angles_ = {}
-        self.arm_controller_ = ArmController()
+
+        self.current_angles_ = [0]*12
+        #self.arm_controller_ = ArmController()
+
+        self.dir_motor_ = {'front_right' : 1, 'back_right' : 1,
+                           'front_left' : -1, 'back_left' : -1}
     
     def arm_pose_callback(self, msg):
         self.arm_controller_.x_desired_ = list(msg.data[:6])
@@ -90,41 +106,15 @@ class ControllerNode(Node):
     def get_command(self, thigh_foot):
         command = [0] * 12
         for i, link in enumerate(self.links_):
+            d = self.dir_motor_[link]
             idx = i * 3
-            command[idx], command[idx+1], command[idx+2] = self.solver_.solve(
-                                                                thigh_foot[link][0], 
-                                                                thigh_foot[link][1], 
-                                                                thigh_foot[link][2]
-                                                            )
+            q = self.solver_.solve(thigh_foot[link][0], 
+                                    thigh_foot[link][1], 
+                                    thigh_foot[link][2], d
+                                )
+            q = [qi * d for qi in q]
+            command[idx:idx+3] = q
         return command
-    
-    def transform(self, frame_source, frame_dst):
-        tf = self.tf_buffer_.lookup_transform(
-                        target_frame=frame_source, 
-                        source_frame=frame_dst,
-                        time=rclpy.time.Time()
-                    )
-
-        q = tf.transform.rotation
-
-        Rot = R.from_quat([
-            q.x,
-            q.y,
-            q.z,
-            q.w
-        ]).as_matrix()
-
-        t = np.array([
-            tf.transform.translation.x,
-            tf.transform.translation.y,
-            tf.transform.translation.z
-        ])
-
-        T = np.eye(4)
-        T[:3,:3] = Rot
-        T[:3,3] = t
-
-        return T 
     
     def pid(self, thigh_foot=None):
         thigh_foot = thigh_foot if thigh_foot is not None else self.thigh_foot_
@@ -147,26 +137,6 @@ class ControllerNode(Node):
     
 
     def control_loop(self):
-        if not self.initialized_:
-            try:
-                for link in self.links_:
-                    self.T_world_foot_[link] = self.transform(frame_source='base_link', frame_dst=f'{link}_feet')
-                    self.T_base_thigh_[link] = self.transform(frame_source='base_link', frame_dst=f'{link}_thigh')
-
-                self.initialized_ = True
-                self.stabilizer_ = Stabilizer(self.T_base_thigh_)
-                self.controller_node_.get_logger().info("Standing: Initialization OK!")
-
-            except Exception as e:
-                self.get_logger().warn(f"Waiting for TF: {e}")
-                command_msg = JointState()
-                command_msg.header.stamp = self.get_clock().now().to_msg()
-                command_msg.name = self.joint_names_
-                command_msg.position = [0] * 12
-                self.joint_state_pub_.publish(command_msg)
-                return
-            
-
         thigh_foot_correct = None
         
         if self.isWalking:
@@ -174,16 +144,9 @@ class ControllerNode(Node):
             thigh_foot_correct = thigh_foot #self.pid(thigh_foot)
 
         elif self.isStanding:
-            self.thigh_foot_, self.T_world_base_ = self.body_controller_.body_pose(self.T_world_base_, 
-                                                                                   self.T_base_thigh_, 
-                                                                                   self.T_world_foot_, 
-                                                                                   self.links_
-                                                                                   )
-            
+            self.thigh_foot_, self.T_world_base_= self.body_controller_.body_pose()
             thigh_foot_correct = self.thigh_foot_ # self.pid()
 
-        
-        
         elif self.isRotating:
             pass # To do
 
@@ -204,9 +167,7 @@ class ControllerNode(Node):
             
         if thigh_foot_correct is not None:
             command = self.get_command(thigh_foot=thigh_foot_correct)
-            for joint_name, angle in zip(self.joint_names_, command):
-                self.body_angles_[joint_name] = angle
-
+            self.current_angles_ = command
             # Publish to Gazebo
             cmd_gazebo = Float64MultiArray()
             cmd_gazebo.data = command

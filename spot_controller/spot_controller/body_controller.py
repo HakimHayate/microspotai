@@ -3,33 +3,54 @@ from tf2_ros import LookupException, ConnectivityException, ExtrapolationExcepti
 from sensor_msgs.msg import JointState
 
 from utils import get_twist, update_pos, get_rotation
-
+import time
 import math
 from std_msgs.msg import Float64MultiArray
 import rclpy
+import pinocchio as pin
 
 class BodyController():
-    def __init__(self, controller_node, joints_names, links, defaultZ, duration = 1.0, 
-                 dt= 0.02):
+    "Idea : Virtually move the base link and keep the foot planted"
+    def __init__(self, model, data, links, 
+                 duration = .020, dt= 0.02):
         
-        self.controller_node_ = controller_node
-        self.joints_names_ = joints_names
-
+        self.model_ = model
+        self.data_ = data
         self.links_ = links
-
         self.duration_ = duration
         self.time_elapsed_ = 0.0
         self.dt_ = dt
 
         self.reached_target_ = True
-        self.initialized_ = False # Initiate feet coordinates
-        
-        self.T_target_ = np.eye(4)
 
+        self.T_target_ = np.eye(4)
         self.S_ = None
 
-    def getT(self):
-        return self.T_world_base_, self.thigh_foot_
+        self.q = np.array([0]*12)
+
+        pin.forwardKinematics(model, data, self.q)
+        pin.updateFramePlacements(model, data)
+
+        base_id = model.getFrameId('world_link')
+        T_world_base = data.oMf[base_id].homogeneous
+        self.T_world_base_initially_ = T_world_base # Initial pose of robot
+        self.T_world_base_ = T_world_base
+        
+        self.T_base_thigh_ = {}
+        self.T_world_foot_ = {}
+        for link in links:
+            thigh_id = model.getFrameId(f'{link}_end_foot_dummy')
+            T_world_thigh = data.oMf[thigh_id].homogeneous
+
+            self.T_base_thigh_[link]= np.linalg.inv(T_world_base) @ T_world_thigh
+
+            foot_id = model.getFrameId(f'{link}_end_foot')
+            self.T_world_foot_[link] = data.oMf[foot_id].homogeneous
+            print(f'T_world_foot_{link} {self.T_world_foot_[link]}')
+
+        self.T_world_base_ = T_world_base
+            
+
     
     def restart(self):
         self.time_elapsed_ = 0
@@ -41,6 +62,7 @@ class BodyController():
         Params:
             desired_pose : dict containing these keys: x, y, z, roll, pitch, yaw in radians
         """
+
         x = desired_pose.get('x', 0)
         y = desired_pose.get('y', 0)
         z = desired_pose.get('z', 0)
@@ -51,7 +73,7 @@ class BodyController():
 
         Rxyz = get_rotation(roll, pitch, yaw) # Convention: Roll-Pitch-Yaw
 
-        self.T_target_ = np.array([
+        self.T_target_ = self.T_world_base_initially_ @ np.array([
             [Rxyz[0,0], Rxyz[0,1], Rxyz[0,2], x],
             [Rxyz[1,0], Rxyz[1,1], Rxyz[1,2], y],
             [Rxyz[2,0], Rxyz[2,1], Rxyz[2,2], z],
@@ -65,28 +87,24 @@ class BodyController():
 
         self.reached_target_ = False   
 
-        
-    def body_pose(self, T_world_base, T_base_thigh, T_world_foot, links):
+    
+
+    def body_pose(self):
         if self.time_elapsed_>= self.duration_: # Robot reached target pose
             self.reached_target_ = True
 
         elif not self.reached_target_:
             self.time_elapsed_ += self.dt_
             # Robot moves slighly each frame to make a smooth movement
-            T_world_base = update_pos(T_world_base, self.S_, dt=self.dt_)
-
+            self.T_world_base_ = update_pos(self.T_world_base_, self.S_, dt=self.dt_)
+            
         thigh_foot = {}
 
-        for i, link in enumerate(links):
-            try:
-                T_world_thigh_current = T_world_base @ T_base_thigh[link] # Move thighs coordinates to new coordinates
-                T_thigh_world = np.linalg.inv(T_world_thigh_current)
-
-                T_thigh_foot = T_thigh_world @ T_world_foot[link] # Foot coordinates in thigh frame
-                
-                thigh_foot[link] = T_thigh_foot[:-1, -1]
-
-            except (LookupException, ConnectivityException, ExtrapolationException) as e:
-                self.controller_node_.get_logger().warn(f'TF Error: {e}')
-
-        return thigh_foot, T_world_base
+        for link in self.links_: 
+            T_world_thigh = self.T_world_base_ @ self.T_base_thigh_[link] # Move thighs coordinates to new coordinates
+            R = self.T_base_thigh_[link][:3,:3]
+            thigh_foot[link] = R.T @ (self.T_world_foot_[link][:-1,-1] - T_world_thigh[:-1,-1])
+            print(f'thigh_foot_{link} {thigh_foot[link]}')
+        
+        print('\n\n')
+        return thigh_foot, self.T_world_base_

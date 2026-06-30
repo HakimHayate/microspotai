@@ -41,7 +41,7 @@ class AppGUI:
         self.y_slider.pack()
 
         
-        self.z_slider = tk.Scale(root, from_=-0.18, to=-0.01, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
+        self.z_slider = tk.Scale(root, from_=-0.18, to=0.3, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
         self.z_slider.set(-0.1)
         self.z_slider.pack()
 

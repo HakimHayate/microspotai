@@ -6,7 +6,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     pkg_share = get_package_share_directory('microspot_description')
     
-    urdf_file = os.path.join(pkg_share, 'urdf', 'microspot.urdf')
+    urdf_file = os.path.join(pkg_share, 'urdf', 'micro_v2.urdf')
     rviz_config = os.path.join(pkg_share, 'rviz', 'urdf_config.rviz')
     
     with open(urdf_file, 'r') as infp:
