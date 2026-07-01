@@ -18,16 +18,15 @@ class LegIKSolver:
         self.l2 = float(l2)
         self.l3 = float(l3)
 
-    def solve(self, x, y, z, d):
-        theta_hip = 0
+    def solve(self, x, y, z):
+        theta_hip = math.atan2(y, math.sqrt(z**2 + x**2))
 
-        d = math.sqrt(y**2 + x**2) 
+        d = math.sqrt(z**2 + x**2 + y**2) 
 
         gamma = math.acos(np.clip((self.l2**2 + self.l3**2 - d**2)/(2 * self.l2 * self.l3), -1.0, 1.0))
         beta = -math.acos(np.clip((self.l2**2 + d**2 - self.l3**2)/(2 * self.l2 * d), -1.0, 1.0))
 
-        alpha = math.atan2(y, -x)
-
+        alpha = math.atan2(x, -z)
         theta_thigh = beta + alpha
         theta_knee = math.pi - gamma
 

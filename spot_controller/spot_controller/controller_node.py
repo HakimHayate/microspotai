@@ -17,7 +17,7 @@ from arm_controller import ArmController
 from ament_index_python.packages import get_package_share_directory
 import os
 import pinocchio as pin
-
+from rotate_controller import RotateController
 
 
 class ControllerNode(Node):
@@ -64,8 +64,14 @@ class ControllerNode(Node):
         self.model_ = pin.buildModelFromXML(robot_desc)
         self.data_ = self.model_.createData()
 
-        self.body_controller_ = BodyController(self.model_, self.data_, self.links_)
-        self.gait_controller_ = GaitController()
+        self.T_base_thigh_ = None
+        self.thigh_foot_ = None
+        self.T_world_base_ = None
+        self.body_controller_ = BodyController(self, self.model_, self.data_, self.links_)
+
+        self.gait_controller_ = GaitController(self.solver_, self.links_)
+        self.rotate_controller_ = RotateController(self.solver_, self.links_, self.T_base_thigh_, self.T_world_base_)
+
         self.stabilizer_ = None
         self.timer_ = self.create_timer(0.01, self.control_loop)
 
@@ -76,8 +82,6 @@ class ControllerNode(Node):
                                               self.imu_callback,
                                               10)
         
-        self.T_world_base_ = np.eye(4)
-        self.thigh_foot_ = None # In world frame
 
         self.imu_last_data_ = None
 
@@ -110,7 +114,7 @@ class ControllerNode(Node):
             idx = i * 3
             q = self.solver_.solve(thigh_foot[link][0], 
                                     thigh_foot[link][1], 
-                                    thigh_foot[link][2], d
+                                    thigh_foot[link][2]
                                 )
             q = [qi * d for qi in q]
             command[idx:idx+3] = q
@@ -140,7 +144,9 @@ class ControllerNode(Node):
         thigh_foot_correct = None
         
         if self.isWalking:
-            thigh_foot = self.gait_controller_.trot_gait(self.thigh_foot_, self.links_)
+            thigh_foot = self.gait_controller_.trot_gait(self.thigh_foot_)
+            if thigh_foot is None:
+                self.isWalking = False
             thigh_foot_correct = thigh_foot #self.pid(thigh_foot)
 
         elif self.isStanding:
@@ -148,7 +154,10 @@ class ControllerNode(Node):
             thigh_foot_correct = self.thigh_foot_ # self.pid()
 
         elif self.isRotating:
-            pass # To do
+            thigh_foot = self.rotate_controller_.rotate(self.thigh_foot_, self.T_world_base_)
+            if thigh_foot is None:
+                self.isRotating = False
+            thigh_foot_correct = thigh_foot
 
         elif self.isArmMoving:
             res = self.arm_controller_.control_loop()
@@ -185,9 +194,6 @@ class ControllerNode(Node):
         self.isWalking = False
         self.isStanding = False
         self.isRotating = False
-
-        self.gait_controller_.restart()
-        self.body_controller_.restart()
 
     def trot_gait_mode(self):
         self.get_logger().info('Executing walking...')

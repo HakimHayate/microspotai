@@ -7,9 +7,9 @@ class AppGUI:
         self.root = root
         self.ros_node = ros_node
         
-        self.root.title("Quadruped Control Panel")
+        self.root.title("Microspot Control Panel")
         self.root.geometry("500x700")
-        self.root.eval('tk::PlaceWindow . center') 
+        self.root.eval('tk::PlaceWindow . left') 
 
 
         label = tk.Label(root, text="Select an Action", font=("Helvetica", 14, "bold"))
@@ -21,9 +21,12 @@ class AppGUI:
         btn_stand = tk.Button(root, text="Stand", command=ros_node.standing_mode, width=20, bg="#2196F3", fg="white")
         btn_stand.pack(pady=5)
 
-        btn_stand = tk.Button(root, text="Move Arm", command=ros_node.arm_mode, width=20, bg="#2196F3", fg="white")
-        btn_stand.pack(pady=5)
+        btn_rotate = tk.Button(root, text="Rotate", command=ros_node.rotating_mode, width=20, bg="#2196F3", fg="white")
+        btn_rotate.pack(pady=5)
 
+        btn_arm = tk.Button(root, text="Move Arm", command=ros_node.arm_mode, width=20, bg="#2196F3", fg="white")
+        btn_arm.pack(pady=5)
+        
         btn_quit = tk.Button(root, text="Quit Node", command=self.quit_app, width=20, bg="#f44336", fg="white")
         btn_quit.pack(pady=5)
 
@@ -41,8 +44,8 @@ class AppGUI:
         self.y_slider.pack()
 
         
-        self.z_slider = tk.Scale(root, from_=-0.18, to=0.3, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
-        self.z_slider.set(-0.1)
+        self.z_slider = tk.Scale(root, from_=-0.25, to=0.1, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
+        self.z_slider.set(0)
         self.z_slider.pack()
 
         
@@ -61,7 +64,6 @@ class AppGUI:
         self.root.protocol("WM_DELETE_WINDOW", self.quit_app)
 
     def on_pose_change(self, event=None):
-        # Only send updates if the robot is actually in the standing state
         if getattr(self.ros_node, 'isStanding', False):
             desired_pose = {
                 'x': float(self.x_slider.get()), 

@@ -1,68 +1,58 @@
-from std_msgs.msg import Float64MultiArray
-import math
-from leg_ik_solver import LegIKSolver
-from sensor_msgs.msg import JointState
+
 import numpy as np
 
 class GaitController():
-    def __init__(self, stride_length=0.06, 
-                 stride_height=0.05, 
-                 len_hip = 0.05, len_thigh= 0.13, 
-                 len_knee = 0.13):
-
-        self.ik_solver_ = LegIKSolver(len_hip, len_thigh, len_knee)
-
-
+    def __init__(self, solverIk, links,  
+                 B=0.06, H=0.05, hz=100, duration=1):
+        self.links_ = links
+        self.ik_solver_ = solverIk
         self.current_positions = [0.0] * 12
-        self.time_elapsed_ = 0.0
-        self.gait_speed = 4.0
+        self.hz_ = hz
+        self.B_ = B
+        self.H_ = H
 
-        self.L = stride_length
-        self.H = stride_height
+        self.coeff_height_ = np.linalg.inv(np.array([ # GOOD 
+            [1, 1, 1, 1],
+            [0.5**6, 0.5**5, 0.5**4, 0.5**3],
+            [6, 5, 4, 3],
+            [30, 20, 12, 6]
+        ])) @ np.array([0, self.H_, 0, 0])
 
-    
-    def get_foot_coordinate(self, phase, thigh_foot=None, defaultZ=-0.15):
-        """
-        Takes a phase parameter from 0 to 2*pi and returns target (X, Z) coordinates in thigh's frame.
-        """
+        self.t_ = 0
+        self.duration_ = duration # seconds
+        T = 1 / hz
+        self.dt_ = 2 * T / self.duration_
+
+    def get_foot_coordinate(self, t, thigh_foot, defaultZ=-0.15):
         if thigh_foot is None:
             thigh_foot = [0, 0, defaultZ]
-
-        phi = phase % (2 * math.pi)
-        
-        if phi < math.pi:
-            z = (self.L / 2.0) * math.cos(phi + math.pi) + thigh_foot[2]
-            x =  - (self.H * math.sin(phi)) + thigh_foot[0]
+        t = t % 2
+        if t <= 1:
+            z = self.coeff_height_[0] * t**6 + self.coeff_height_[1] * t**5 + self.coeff_height_[2] * t**4 + self.coeff_height_[3] * t**3 + thigh_foot[2]
+            x =  -self.B_ / 2 + self.B_ * t + thigh_foot[0]
             
         else:
-            stance_progress = (phi - math.pi) / math.pi 
-            z = (self.L / 2.0) - (self.L * stance_progress) + thigh_foot[2]
-            x = thigh_foot[0]
+            z = thigh_foot[2]
+            x = self.B_ / 2 - self.B_ * (t - 1) + thigh_foot[0]
             
-        return x, 0, z
+        return x, thigh_foot[1], z # Keep y at 0 for stability
     
  
-    def restart(self):
-        self.time_elapsed_ = 0
-
- 
-    def trot_gait(self, thigh_foot, links, reset=False):
-        if reset:
-            self.time_elapsed_ = 0
-
-        self.time_elapsed_ += 0.02
-        base_phase = self.time_elapsed_ * self.gait_speed
-
-        fr = self.get_foot_coordinate(base_phase, thigh_foot['front_right'])
-        bl = self.get_foot_coordinate(base_phase, thigh_foot['back_left'])
+    def trot_gait(self, thigh_foot):
+        if thigh_foot is None:
+            print('Body pose not initialized')
+            return None
         
-        fl = self.get_foot_coordinate(base_phase + math.pi, thigh_foot['front_left'])
-        br = self.get_foot_coordinate(base_phase + math.pi, thigh_foot['back_right'])
-        
-        tmp = [fr, br, bl, fl] # Same order as in links
+        if self.t_ > 2:
+            self.t_ = 0
+        self.t_ += self.dt_
+
         command = {}
 
-        for i, link in enumerate(links):
-            command[link] = tmp[i]
+        command['front_right'] = self.get_foot_coordinate(self.t_, thigh_foot['front_right'])
+        command['back_left'] = self.get_foot_coordinate(self.t_, thigh_foot['back_left'])
+        
+        command['front_left'] = self.get_foot_coordinate(self.t_ + 1, thigh_foot['front_left'])
+        command['back_right'] = self.get_foot_coordinate(self.t_ + 1, thigh_foot['back_right'])
         
         return command

@@ -70,14 +70,9 @@ def isCollision(q, model, collision_model, data, collision_data):
     return is_colliding
 
 def remove_manual_collision_pair(collision_model, name1, name2):
-    """
-    Finds all geometries matching the strings and removes their collision pairs.
-    """
-    # Find all geometry IDs that contain our target link names
     ids_1 = [i for i, geom in enumerate(collision_model.geometryObjects) if name1 in geom.name]
     ids_2 = [i for i, geom in enumerate(collision_model.geometryObjects) if name2 in geom.name]
     
-    # Remove every pairing between these two links
     for i1 in ids_1:
         for i2 in ids_2:
             pair = pin.CollisionPair(i1, i2)

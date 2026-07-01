@@ -11,7 +11,7 @@ import pinocchio as pin
 
 class BodyController():
     "Idea : Virtually move the base link and keep the foot planted"
-    def __init__(self, model, data, links, 
+    def __init__(self, controller_node, model, data, links, 
                  duration = .020, dt= 0.02):
         
         self.model_ = model
@@ -39,18 +39,17 @@ class BodyController():
         self.T_base_thigh_ = {}
         self.T_world_foot_ = {}
         for link in links:
-            thigh_id = model.getFrameId(f'{link}_end_foot_dummy')
+            thigh_id = model.getFrameId(f'{link}_thigh')
             T_world_thigh = data.oMf[thigh_id].homogeneous
 
             self.T_base_thigh_[link]= np.linalg.inv(T_world_base) @ T_world_thigh
 
             foot_id = model.getFrameId(f'{link}_end_foot')
             self.T_world_foot_[link] = data.oMf[foot_id].homogeneous
-            print(f'T_world_foot_{link} {self.T_world_foot_[link]}')
 
         self.T_world_base_ = T_world_base
-            
-
+        controller_node.T_base_thigh_ = self.T_base_thigh_
+        controller_node.T_world_base_ = self.T_world_base_
     
     def restart(self):
         self.time_elapsed_ = 0
@@ -88,7 +87,6 @@ class BodyController():
         self.reached_target_ = False   
 
     
-
     def body_pose(self):
         if self.time_elapsed_>= self.duration_: # Robot reached target pose
             self.reached_target_ = True
@@ -103,8 +101,6 @@ class BodyController():
         for link in self.links_: 
             T_world_thigh = self.T_world_base_ @ self.T_base_thigh_[link] # Move thighs coordinates to new coordinates
             R = self.T_base_thigh_[link][:3,:3]
-            thigh_foot[link] = R.T @ (self.T_world_foot_[link][:-1,-1] - T_world_thigh[:-1,-1])
-            print(f'thigh_foot_{link} {thigh_foot[link]}')
+            thigh_foot[link] = (self.T_world_foot_[link][:-1,-1] - T_world_thigh[:-1,-1])
         
-        print('\n\n')
         return thigh_foot, self.T_world_base_

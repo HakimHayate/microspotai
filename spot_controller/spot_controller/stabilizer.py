@@ -21,13 +21,9 @@ class Stabilizer:
             thigh_foot_h[:3] = thigh_foot[link]
 
             foot_world_sensor = T_world_base_sensor @ self.T_base_thigh_[link] @ thigh_foot_h
-
             foot_world_ref = T_world_base_ref @ self.T_base_thigh_[link] @ thigh_foot_h
-
             error_foot_world = foot_world_ref[:3] - foot_world_sensor[:3]
-
             R_world_thigh = (T_world_base_sensor @ self.T_base_thigh_[link])[:3, :3]
-
             error[link] = R_world_thigh.T @ error_foot_world
 
         return error
