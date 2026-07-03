@@ -3,10 +3,6 @@ from nearestNeighbor import Tree
 
 def transform(src, dst):
     '''
-    Computes the least-squares rigid transformation
-    (rotation + translation) that maps src to dst.
-    Reflections are corrected so that det(R)=1.
-
     Args:
         src: N * m numpy array, N numbers of points, m number of dimensions
         dst: N * m numpy array, N numbers of points, m number of dimensions 
@@ -31,13 +27,13 @@ def transform(src, dst):
         S[-1, -1] = -1
 
     C = Vt.T @ S @ U.T
-    r = dst_centroid - C @ src_centroid
+    r = src_centroid - C.T @ dst_centroid
 
-    T = np.eye(src.shape[1]+1)
-    T[:-1, :-1] = C
-    T[:-1, -1] = r
+    T_src_dest = np.eye(src.shape[1]+1)
+    T_src_dest[:-1, :-1] = C.T
+    T_src_dest[:-1, -1] = r   
 
-    return T
+    return T_src_dest
 
 
 def toHomogeneous(points):
