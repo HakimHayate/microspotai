@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+from jacobians import compute_gradient_analytical, compute_gradient_numerical
+import copy
 
 class PoseNode:
-    def __init__(self, id, pose, scan): # Pose : x, y, theta
+    def __init__(self, id, pose, scan=None): # Pose : x, y, theta
         self.id_ = id
         self.pose_ = np.array(pose, dtype=float)
         self.scan_ = scan
@@ -23,12 +24,16 @@ class Graph:
     def __init__(self):
         self.nodes_dict_ = {}
         self.edges_ = []
+        self.free_id_ = 0
 
-    def add_node(self, node):
+    def add_node(self, pose):
+        node = PoseNode(self.free_id_, pose)
         self.nodes_dict_[node.id_] = node
+        self.free_id_ += 1
+        return node.id_
 
-    def add_edge(self, edge):
-        self.edges_.append(edge)
+    def add_edge(self, id_source, id_destination, measurement):
+        self.edges_.append(Edge(id_source, id_destination, measurement))
 
     def print_graph(self):
         print("Poses")
@@ -39,8 +44,14 @@ class Graph:
         for e in self.edges_:
             print(f"{e.id_source_} -> {e.id_destination_}   z = {e.measurement_}")
 
-
+    def copy(self):
+        new_graph = Graph()
+        new_graph.nodes_dict_ = copy.deepcopy(self.nodes_dict_)
+        new_graph.edges_ = copy.deepcopy(self.edges_)
+        return new_graph
+    
     def draw_graph(self):
+        plt.clf()
         for node in self.nodes_dict_.values():
             plt.scatter(node.pose_[0], node.pose_[1], c='blue')
             plt.text(node.pose_[0], node.pose_[1], node.id_)
@@ -49,7 +60,7 @@ class Graph:
                 node.pose_[1],
                 0.1*np.cos(node.pose_[2]),
                 0.1*np.sin(node.pose_[2]),
-                head_width=0.03
+                head_width=0.005
             )
         
         for e in self.edges_:
@@ -62,14 +73,15 @@ class Graph:
             
         plt.axis('equal')
         plt.grid()
-        plt.show()
+        plt.draw()
+        plt.pause(0.01)
 
 
 def main():
-    example_pose0 = PoseNode(0, [0, 0, 0])
-    example_pose1 = PoseNode(1, [0, 0.1, 0.5])
-    example_pose2 = PoseNode(2, [0.7, 0.5, 1.1])
-    example_pose3 = PoseNode(3, [2.0, 0.5, 0.4])
+    example_pose0 = [0, 0, 0]
+    example_pose1 = [0, 0.1, 0.5]
+    example_pose2 = [0.7, 0.5, 1.1]
+    example_pose3 = [2.0, 0.5, 0.4]
 
     edge_01 = Edge(0, 1, [0, 0.1, 0.5])
     edge_12 = Edge(1, 2, [0.7, 0.4, 0.6])
@@ -88,8 +100,14 @@ def main():
     graph.add_edge(edge_23)
     graph.add_edge(edge_30)
 
-    graph.print_graph()
-    graph.draw_graph()
+    #graph.print_graph()
+    #graph.draw_graph()
+    
+    J_anal = compute_gradient_analytical(graph)
+    J_num = compute_gradient_numerical(graph)
 
+    print(J_anal)
+    print('\n')
+    print(J_num)
 if __name__ == '__main__':
     main()

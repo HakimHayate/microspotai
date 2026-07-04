@@ -1,5 +1,6 @@
 import numpy as np
 from nearestNeighbor import Tree
+from se2 import *
 
 def transform(src, dst):
     '''
@@ -8,7 +9,7 @@ def transform(src, dst):
         dst: N * m numpy array, N numbers of points, m number of dimensions 
     
     Returns:
-        T: Transformation matrix mapping src to dst
+        T: Transformation matrix mapping dst to src
     '''
 
     assert src.shape == dst.shape
@@ -44,25 +45,54 @@ def toHomogeneous(points):
 
 
 def icp(src, dst, max_interation=50, tol=1e-3):
-    tree = Tree(dst)
+    tree = Tree(src)
     tree.build_tree()
     error = np.inf
     
-    T_dst_src = np.eye(src.shape[1]+1)
+    T_src_dst = np.eye(src.shape[1]+1)
 
     for _ in range(max_interation):
-        dst_match, src_match = tree.search(src)
+        dst_match, src_match = tree.search(dst)
 
         T = transform(src_match, dst_match)
-        T_dst_src = T @ T_dst_src 
+        T_src_dst = T @ T_src_dst 
 
-        src_h = toHomogeneous(src)
-        src_h = (T @ src_h.T).T
-        src = src_h[:, :-1]
+        dst_h = toHomogeneous(dst)
+        dst_h = (T @ dst_h.T).T
+        dst = dst_h[:, :-1]
 
         error = np.sqrt(((dst_match - src_match)**2).sum(axis=1)).mean(axis=0)
 
         if error < tol:
             break
     
-    return T_dst_src
+    return T_src_dst
+
+def rotate(src, measurement):
+    T = v2t(measurement)
+    print(T.shape)
+    src_h = np.ones((src.shape[0]+1, src.shape[1]))
+    src_h[:-1, :] = src
+    return (T @ src_h)[:-1]
+
+def main():
+    src = np.random.rand(10, 2)
+
+    T_true = v2t(np.array([0.1, 0.2, 0.57]))
+
+    src_h = toHomogeneous(src)
+    dst = (np.linalg.inv(T_true) @ src_h.T).T[:, :2]   # because transform() claims dst -> src
+
+    T_est = transform(src, dst)
+    
+
+    print("True:")
+    print(T_true)
+
+    print("Estimated:")
+    print(T_est)
+
+    print(t2v(T_est))
+
+if __name__ == '__main__':
+    main()

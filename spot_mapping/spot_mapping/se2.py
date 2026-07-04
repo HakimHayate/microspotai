@@ -22,10 +22,13 @@ def compose(T1, T2):
 
 def inv(T):
     T_inv = np.eye(3)
-    T_inv = T[:2, :2].T
-    T_inv[:2, -1] = np.array([1/T[0], 1/T[1]])
+    T_inv[:2, :2] = T[:2, :2].T
+    T_inv[:2, -1] = -T[:2, :2].T @ T[:2, -1]
 
     return T_inv
 
 def relative(xA, xB):
     return t2v(compose(inv(v2t(xA)), v2t(xB))) 
+
+def wrap_angle(angle):
+    return (angle + np.pî) % (2*np.pi) - np.pi
