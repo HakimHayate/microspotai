@@ -1,9 +1,8 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Imu
+from sensor_msgs.msg import Imu, Float64
 import math
 import numpy as np
-
 
 def get_correction_angle(x, y, z):
     roll =   -math.atan2(-y, math.sqrt(x*x + z*z))
@@ -47,6 +46,7 @@ class MyNode(Node):
     def __init__(self):
         super().__init__('imu_filter_node')
         self.filtered_angle = np.zeros(2)
+        self.yaw_ = 0
         self.imu_sub_ = self.create_subscription(
             Imu, 
             '/imu/data_raw', 
@@ -55,12 +55,15 @@ class MyNode(Node):
         self.imu_pub_ = self.create_publisher(Imu,
                                               '/imu/data',
                                               10)
+        self.yaw_pub_ = self.create_publisher(Float64, '/imu/yaw', 10)
         
 
     def filter_imu_callback(self, msg):
         linear_acceleration = msg.linear_acceleration
         angular_velocity = msg.angular_velocity
 
+        self.yaw_ += angular_velocity.z * 0.001
+        
         correction_angle = get_correction_angle(linear_acceleration.x,
                                             linear_acceleration.y,
                                             linear_acceleration.z)
@@ -85,6 +88,10 @@ class MyNode(Node):
         filtered_msg.orientation.w = q[3]
 
         self.imu_pub_.publish(filtered_msg)
+
+        msg_yaw = Float64()
+        msg_yaw.data = self.yaw_
+        self.yaw_pub_.publish(msg_yaw)
 
 def main(args=None):
     rclpy.init(args=args)

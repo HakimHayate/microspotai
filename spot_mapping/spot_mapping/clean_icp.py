@@ -44,15 +44,19 @@ def toHomogeneous(points):
 
 
 
-def icp(src, dst, max_interation=50, tol=1e-3):
+def icp(src, dst, yaw, max_interation=50, tol=1e-5):
     tree = Tree(src)
     tree.build_tree()
     error = np.inf
     
-    T_src_dst = np.eye(src.shape[1]+1)
-
+    
+    T_src_dst = v2t([0, 0, yaw])
+    dst_h = toHomogeneous(dst)
+    dst_h = (T @ dst_h.T).T
+    dst = dst_h[:, :-1]
+    
     for _ in range(max_interation):
-        dst_match, src_match = tree.search(dst)
+        src_match, dst_match = tree.search(dst)
 
         T = transform(src_match, dst_match)
         T_src_dst = T @ T_src_dst 
@@ -76,6 +80,8 @@ def rotate(src, measurement):
     return (T @ src_h)[:-1]
 
 def main():
+    
+
     src = np.random.rand(10, 2)
 
     T_true = v2t(np.array([0.1, 0.2, 0.57]))
@@ -84,6 +90,7 @@ def main():
     dst = (np.linalg.inv(T_true) @ src_h.T).T[:, :2]   # because transform() claims dst -> src
 
     T_est = transform(src, dst)
+    T_est_icp = icp(src, dst)
     
 
     print("True:")
@@ -91,6 +98,9 @@ def main():
 
     print("Estimated:")
     print(T_est)
+
+    print("Estimated icp:")
+    print(T_est_icp)
 
     print(t2v(T_est))
 
