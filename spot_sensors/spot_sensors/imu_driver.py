@@ -14,7 +14,7 @@ class ImuDriver:
 
         self.accel_offset = calibration.get(
             "accel",
-            {"x": 0.0, "y": 0.0, "z": 0.0}
+            {"x": 0.0, "y": 0.0, "z": 9.81}
         )
 
     def read(self):

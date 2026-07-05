@@ -50,11 +50,11 @@ def icp(src, dst, yaw, max_interation=50, tol=1e-5):
     error = np.inf
     
     
-    T_src_dst = v2t([0, 0, yaw])
+    T_src_dst = np.linalg.inv(v2t([0, 0, yaw]))
     dst_h = toHomogeneous(dst)
-    dst_h = (T @ dst_h.T).T
+    dst_h = (T_src_dst @ dst_h.T).T
     dst = dst_h[:, :-1]
-    
+
     for _ in range(max_interation):
         src_match, dst_match = tree.search(dst)
 

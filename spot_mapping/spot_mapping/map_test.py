@@ -40,7 +40,7 @@ data_queue = queue.Queue(maxsize=1000)
 plot_queue = queue.Queue(maxsize=2)
 
 def producer():
-    PORT_NAME = "COM6"
+    PORT_NAME = "/dev/ttyUSB0"
     lidar = RPLidar(PORT_NAME, timeout=3, baudrate=115200)
     
     try:
@@ -97,7 +97,7 @@ def consumer():
             continue
 
         current_pts = polar_to_cartezian(scan)
-
+        print(len(current_pts))
         if prev_pts is None:
             prev_pts = current_pts
             continue
@@ -106,10 +106,10 @@ def consumer():
         
 
         T_prev_current = clean_icp(prev_pts[:m, :], current_pts[:m, :], global_yaw)
-        print(f'yaw = {global_yaw}')
-        measurement = t2v(T_prev_current)
 
-        if np.linalg.norm(measurement[:2]) < tol_trans or (measurement[-1]) < tol_rotation:
+        measurement = t2v(T_prev_current)
+        #print(f'pose = {measurement}')
+        if np.linalg.norm(measurement[:2]) < tol_trans and (measurement[-1]) < tol_rotation:
             continue
 
         T_global_current = T_global_prev @ T_prev_current
@@ -125,7 +125,7 @@ def consumer():
         
         pose_theta = math.atan2(T_global_current[1, 0], T_global_current[0, 0])
         pose_x, pose_y = T_global_current[:-1, -1]
-        print(f'pose = {measurement}')
+        
         print(f'global coordinate : {pose_x, pose_y, pose_theta}')
         #map.update(pose_x, pose_y, pose_theta, scan)
 
@@ -138,16 +138,6 @@ def consumer():
         # plot_queue.put((current_pts, prev_pts))
         prev_pts = current_pts
         #graph.draw_graph()
-
-        plt.clf() 
-        print(len(current_pts))
-        plt.plot(current_pts[:, 0], current_pts[:, 1], 'r.', markersize=2)
-        
-        plt.axis('equal') 
-        plt.grid(True)
-        
-        plt.draw()
-        plt.pause(0.01)
         
 shutdown_event = threading.Event()
 
