@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from jacobians import compute_gradient_analytical, compute_gradient_numerical
 import copy
+from se2 import wrap_angle
 
 class PoseNode:
-    def __init__(self, id, pose, scan=None): # Pose : x, y, theta
+    def __init__(self, id, pose, pts): # Pose : x, y, theta
         self.id_ = id
         self.pose_ = np.array(pose, dtype=float)
-        self.scan_ = scan
+        self.pts_ = pts
 
     def __repr__(self):
         return f"{self.id_}: ({self.pose_[0]:.2f}, {self.pose_[1]:.2f}, {self.pose_[2]:.2f})"
@@ -26,14 +27,28 @@ class Graph:
         self.edges_ = []
         self.free_id_ = 0
 
-    def add_node(self, pose):
-        node = PoseNode(self.free_id_, pose)
+    def add_node(self, pose, pts):
+        node = PoseNode(self.free_id_, pose, pts)
         self.nodes_dict_[node.id_] = node
         self.free_id_ += 1
         return node.id_
 
     def add_edge(self, id_source, id_destination, measurement):
         self.edges_.append(Edge(id_source, id_destination, measurement))
+
+    def check_loop_closure(self, current_node_id, tol_translation=2, tol_rotation=0.0174533 * 50, mid_nodes = 20):
+        condidates = []
+        current_node = self.nodes_dict_[current_node_id]
+        for id in self.nodes_dict_:
+            if abs(current_node_id - id) <= mid_nodes:
+                continue
+            node = self.nodes_dict_[id]
+            dist = np.linalg.norm(node.pose_[:2] - current_node.pose_[:2])
+            angle = abs(wrap_angle(node.pose_[2] - current_node.pose_[2]))
+            if dist < tol_translation and angle < tol_rotation:
+                condidates.append(id)
+        return condidates
+    
 
     def print_graph(self):
         print("Poses")

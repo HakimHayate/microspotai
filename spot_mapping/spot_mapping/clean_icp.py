@@ -1,6 +1,7 @@
 import numpy as np
 from nearestNeighbor import Tree
 from se2 import *
+from scipy.spatial import cKDTree
 
 def transform(src, dst):
     '''
@@ -44,33 +45,43 @@ def toHomogeneous(points):
 
 
 
-def icp(src, dst, yaw, max_interation=50, tol=1e-5):
-    tree = Tree(src)
-    tree.build_tree()
+def icp(src, dst, guess, max_interation=50, tol=1e-2):
+    tree = cKDTree(src)
+
     error = np.inf
     
-    
-    T_src_dst = np.linalg.inv(v2t([0, 0, yaw]))
-    dst_h = toHomogeneous(dst)
-    dst_h = (T_src_dst @ dst_h.T).T
-    dst = dst_h[:, :-1]
+    T_src_dst = v2t(guess)
+    dst = project(T_src_dst, dst)
 
     for _ in range(max_interation):
-        src_match, dst_match = tree.search(dst)
+        distances, indices = tree.query(dst)
+        valid_matches = distances <= tol
 
+        if np.sum(valid_matches) < 3:
+            return None
+        
+        src_match = src[indices[valid_matches]]
+        dst_match = dst[valid_matches]
+
+        if len(src_match) <= 0:
+            print('ICP failed ')
+            return None
+        
         T = transform(src_match, dst_match)
         T_src_dst = T @ T_src_dst 
 
-        dst_h = toHomogeneous(dst)
-        dst_h = (T @ dst_h.T).T
-        dst = dst_h[:, :-1]
+        dst = project(T, dst)
 
-        error = np.sqrt(((dst_match - src_match)**2).sum(axis=1)).mean(axis=0)
+        error = np.mean(distances[valid_matches])
 
         if error < tol:
             break
+
+    if error > tol:
+        print('ICP failed ')
+        return None
     
-    return T_src_dst
+    return T_src_dst, error
 
 def rotate(src, measurement):
     T = v2t(measurement)

@@ -92,46 +92,98 @@ class Tree:
 
         return best_point, best_dist
     
-    def search(self, points):
+    def compute_stats(self, distances):
+        if distances is None:
+            return
+        distances.sort()
+        distances = np.array(distances)
+        print(f'distance min {np.min(distances)}')
+        print(f'distance max {np.max(distances)}')
+        print(f'distance mean {np.mean(distances)}')
+        print(f'distance median {np.median(distances)}')
+        print()
+
+    def search(self, points, dist_tol= 0.02):
         matches_tree = []
         matches_points = []
+        distances = []
         for p in points:
-            best_point , _ = self.search_tree(p)
+            best_point, dist = self.search_tree(p)
+            #distances.append(dist)
+            if dist > dist_tol:
+                continue
             matches_tree.append(best_point)
             matches_points.append(p)
+        #self.compute_stats(distances)
         return np.array(matches_tree).reshape(-1,2), np.array(matches_points).reshape(-1, 2)
 
 # A test with brute force to see if I get same results (TEST OK!)
-def brute_search(points, target):
-    best = None
-    best_dist = np.inf
-    for p in points:
-        d = euclidian_distance(p, target)
-        if d < best_dist:
-            best = p
-            best_dist = d
+def brute_search_batch(src_points, target_points, dist_tol=0.1):
+    matches_brute = []
+    matches_points = []
     
-    return np.array(best)
+    for target in target_points:
+        best = None
+        best_dist = np.inf
+        for p in src_points:
+            d = euclidian_distance(p, target)
+            if d < best_dist:
+                best = p
+                best_dist = d
+        
+        matches_brute.append(best)
+        matches_points.append(target)
+            
+    return matches_brute, matches_points
 
-from scipy.spatial import KDTree
-from sklearn.neighbors import NearestNeighbors
+import time
 
 def main():
-    points = np.random.random((100000, 2)) *5 + 50 
-    neigh = NearestNeighbors(n_neighbors=1)
+    print("Generating point clouds...")
     
-    tree = Tree(points)
+    src_points = np.random.random((10000, 2)) * 10
+    
+    target_points = np.random.random((500, 2)) * 10 
+    
+
+    print("\nBuilding KD-Tree...")
+    tree = Tree(src_points)
+    start_time = time.time()
     tree.build_tree()
-    kd = KDTree(points)
-    for _ in range(100):
-        target = np.random.random(2) * 5 + 50
-        
-        p_tree, _ = tree.search_tree(target)
-        p_brute = brute_search(points, target)
-        dist, idx = kd.query(target)
-        if p_tree[0] != points[idx][0] or p_tree[1] != points[idx][1]:
-            print('mismatch')
-            break
+    print(f"Tree built in: {time.time() - start_time:.4f} seconds")
+
+
+    print("\nRunning KD-Tree Search...")
+    start_time = time.time()
+    tree_matches_src, tree_matches_tgt = tree.search(target_points, dist_tol=tol)
+    tree_time = time.time() - start_time
+    print(f"KD-Tree found {len(tree_matches_src)} valid matches in {tree_time:.4f} seconds")
+
+
+    print("\nRunning Brute Force Search...")
+    start_time = time.time()
+    brute_matches_src, brute_matches_tgt = brute_search_batch(src_points, target_points, dist_tol=tol)
+    brute_time = time.time() - start_time
+    print(f"Brute Force found {len(brute_matches_src)} valid matches in {brute_time:.4f} seconds")
+
+
+    print("\n--- RESULTS ---")
+    
+    if len(tree_matches_src) != len(brute_matches_src):
+        print(" MISMATCH: Algorithms found different numbers of matches!")
+        return
+
+
+    mismatches = 0
+    for i in range(len(tree_matches_src)):
+        if not np.array_equal(tree_matches_src[i], brute_matches_src[i]):
+            mismatches += 1
+
+    if mismatches == 0:
+        print("SUCCESS: KD-Tree perfectly matches Brute Force!")
+        print(f"Speedup Factor: KD-Tree is {brute_time / tree_time:.1f}x faster than Brute Force.")
+    else:
+        print(f"FAILED: Found {mismatches} mismatched points between the algorithms.")
 
 if __name__ == '__main__':
     main()

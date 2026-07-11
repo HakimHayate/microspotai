@@ -8,7 +8,7 @@ import math
 shutdown_event = threading.Event()
 
 def lidar_worker(node):
-    PORT_NAME = "/ttyUSB0"
+    PORT_NAME = "/dev/ttyUSB0"
     lidar = RPLidar(PORT_NAME, timeout=3, baudrate=115200)
     
     try:
@@ -29,10 +29,8 @@ class LidarPublisher(Node):
     def __init__(self):
         super().__init__('lidar_publisher')
         self.publisher_ = self.create_publisher(LaserScan, 'scan', 10)
-        
-        timer_period = 0.1  
+         
         self.num_bins = 360
-        self.timer = self.create_timer(timer_period, self.timer_callback)
 
     def publish_scan(self, scan):
         msg = LaserScan()

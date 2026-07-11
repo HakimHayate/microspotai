@@ -12,7 +12,7 @@ def magic_optimizer(graph, max_iteration=100, alpha = 0.01, tol=1e-4):
 
         for id in graph.nodes_dict_:
             graph.nodes_dict_[id].pose_ -= alpha * gradient[id*3:id*3+3]
-            graph.nodes_dict_[id].pose_[2] = wrap_angle(graph.nodes_dict_[id*3].pose_[2])
+            graph.nodes_dict_[id].pose_[2] = wrap_angle(graph.nodes_dict_[id].pose_[2])
 
         current_cost = cost_function(graph)
 
