@@ -5,7 +5,7 @@ from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
 
 # 1. Load the configuration
-def load_config(filename="robot_config.json"):
+def load_config(filename="micro_config.json"):
     with open(filename, 'r') as file:
         return json.load(file)
 

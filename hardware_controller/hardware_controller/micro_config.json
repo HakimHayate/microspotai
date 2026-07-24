@@ -6,18 +6,18 @@
   },
   "servos": {
     "FL_Hip":   {"board": "pca_2", "pin": 12},
-    "FL_Thigh": {"board": "pca_2", "pin": 7},
+    "FL_Thigh": {"board": "pca_2", "pin": 2},
     "FR_Thigh":  {"board": "pca_2", "pin": 3},
     "FR_Hip":   {"board": "pca_2", "pin": 0},
 
     "FL_Knee": {"board": "pca_1", "pin": 0},
     "FR_Knee":  {"board": "pca_1", "pin": 15},
-    "BR_Knee":   {"board": "pca_3", "pin": 6},
-    "BL_Hip": {"board": "pca_3", "pin": 15},
+    "BR_Knee":   {"board": "pca_3", "pin": 15},
+    "BL_Hip": {"board": "pca_3", "pin": 8},
 
     "BR_Hip":  {"board": "pca_1", "pin": 3},
     "BL_Knee":   {"board": "pca_1", "pin": 12},
     "BR_Thigh": {"board": "pca_3", "pin": 2},
-    "BL_thigh":  {"board": "pca_3", "pin": 13}
+    "BL_thigh":  {"board": "pca_3", "pin": 7}
   }
 }

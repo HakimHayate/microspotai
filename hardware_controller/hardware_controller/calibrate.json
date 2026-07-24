@@ -1,0 +1,22 @@
+{
+    "joints" : {
+        "front_left_hip_joint": 95.0,
+        "front_left_thigh_joint": 105.0,
+        "front_right_thigh_joint": 100.0,
+        "front_right_hip_joint": 95.0,
+        "front_left_knee_joint": 110.0,
+        "front_right_knee_joint": 105.0,
+        "back_right_knee_joint": 80.0,
+        "back_left_hip_joint": 85.0,
+        "back_right_hip_joint": 95.0,
+        "back_left_knee_joint": 105.0,
+        "back_right_thigh_joint": 97.0,
+        "back_left_thigh_joint": 85.0
+    },
+
+    "direction" : {
+            "right" : 1,
+            "left" : -1
+        }
+    
+}
