@@ -36,15 +36,15 @@ class LidarPublisher(Node):
         msg = LaserScan()
         
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = 'laser_frame'
+        msg.header.frame_id = 'laser'
         
-        msg.angle_min = 0             
+        msg.angle_min = 0.0             
         msg.angle_max = 2.0 * math.pi  
         
         msg.angle_increment = (msg.angle_max - msg.angle_min) / self.num_bins
         
-        msg.range_min = 0.10               
-        msg.range_max = 15.0  
+        msg.range_min = 0.10                
+        msg.range_max = 6.0
 
         msg.ranges = [float('inf')] * self.num_bins
         msg.intensities = [0.0] * self.num_bins  

@@ -36,14 +36,14 @@ class Graph:
     def add_edge(self, id_source, id_destination, measurement):
         self.edges_.append(Edge(id_source, id_destination, measurement))
 
-    def check_loop_closure(self, current_node_id, tol_translation=2, tol_rotation=0.0174533 * 50, mid_nodes = 20):
+    def check_loop_closure(self, current_node_id, tol_translation=1, tol_rotation=np.deg2rad(5), mid_nodes = 50):
         condidates = []
         current_node = self.nodes_dict_[current_node_id]
         for id in self.nodes_dict_:
             if abs(current_node_id - id) <= mid_nodes:
                 continue
             node = self.nodes_dict_[id]
-            dist = np.linalg.norm(node.pose_[:2] - current_node.pose_[:2])
+            dist = np.linalg.norm (node.pose_[:2] - current_node.pose_[:2])
             angle = abs(wrap_angle(node.pose_[2] - current_node.pose_[2]))
             if dist < tol_translation and angle < tol_rotation:
                 condidates.append(id)

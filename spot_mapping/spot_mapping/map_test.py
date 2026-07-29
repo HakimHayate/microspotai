@@ -3,7 +3,7 @@ import math
 import threading
 
 import time
-from clean_icp import icp as clean_icp
+from icp_point2line import icp_point2line as clean_icp
 
 from graph import Graph
 from nav_msgs.msg import OccupancyGrid
@@ -222,7 +222,7 @@ def mapping_worker(node):
         prev_yaw = current_yaw
         T_global_prev = T_global_current
         prev_node_id = current_node_id
-
+        continue
         condidates = graph.check_loop_closure(current_node_id)
         if len(condidates) > 0:
             for id in condidates:

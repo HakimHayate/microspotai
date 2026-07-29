@@ -72,7 +72,7 @@ class ControllerNode(Node):
         self.gait_controller_ = GaitController(self.solver_, self.links_)
         self.rotate_controller_ = RotateController(self.solver_, self.links_, self.T_base_thigh_, self.T_world_base_)
 
-        self.stabilizer_ = None
+        self.stabilizer_ = Stabilizer(self.T_base_thigh_)
         self.timer_ = self.create_timer(0.01, self.control_loop)
 
         self.joint_state_pub_ = self.create_publisher(JointState, '/joint_states', 10)
@@ -120,7 +120,7 @@ class ControllerNode(Node):
             command[idx:idx+3] = q
         return command
     
-    def pid(self, thigh_foot=None):
+    def stabilize(self, thigh_foot=None):
         thigh_foot = thigh_foot if thigh_foot is not None else self.thigh_foot_
 
         thigh_foot_corrected = {}
@@ -147,11 +147,11 @@ class ControllerNode(Node):
             thigh_foot = self.gait_controller_.trot_gait(self.thigh_foot_)
             if thigh_foot is None:
                 self.isWalking = False
-            thigh_foot_correct = thigh_foot #self.pid(thigh_foot)
+            thigh_foot_correct = self.stabilize(thigh_foot)
 
         elif self.isStanding:
             self.thigh_foot_, self.T_world_base_= self.body_controller_.body_pose()
-            thigh_foot_correct = self.thigh_foot_ # self.pid()
+            thigh_foot_correct = self.stabilize()
 
         elif self.isRotating:
             thigh_foot = self.rotate_controller_.rotate(self.thigh_foot_, self.T_world_base_)
@@ -236,7 +236,7 @@ def main(args=None):
         pass
     finally:
         executor.shutdown()
-        spin_thread.join(timeout=1.0) 
+        spin_thread.join(timeout=1.0)  
         
         if rclpy.ok():
             node.destroy_node()

@@ -96,9 +96,9 @@ def match_version2(tree, new_points):
     return np.array(matching_points_source).reshape(-1, 2), np.array(matching_points_destiny).reshape(-1, 2), distances # returns array N x 2
 
 
-def raycaster(p_start, p_end, max_iterations=100):
+def raycaster(p_start, p_end):
     '''
-    Bresenham's line algorithm, takes 2 points in a grid and give the path that connects them.
+    Bresenham's line algorithm, takes 2 points in a grid and gives the path that connects them.
 
     Parameters
         p_start : sequence[int]
@@ -111,31 +111,39 @@ def raycaster(p_start, p_end, max_iterations=100):
         list[tuple[int, int]]
             Ordered list of grid coordinates from p_start to p_end
     '''
-    x_robot, y_robot, x_hit, y_hit = p_start[0], p_start[1], p_end[0], p_end[1]
+    x_robot, y_robot = int(p_start[0]), int(p_start[1])
+    x_hit, y_hit = int(p_end[0]), int(p_end[1])
+
     dx = abs(x_hit - x_robot)
     dy = abs(y_hit - y_robot)
 
-    sx = -1 if x_hit - x_robot < 0 else 1
-    sy = -1 if y_hit - y_robot < 0 else 1
+    sx = 1 if x_hit > x_robot else -1
+    sy = 1 if y_hit > y_robot else -1
 
     current_x, current_y = x_robot, y_robot
-
     path = [(current_x, current_y)]
+    
     e = dx - dy
 
-    for i in range(max_iterations):
-        if (current_x, current_y) == (x_hit, y_hit):
+    # Dynamic max iterations ensures long rays never truncate early
+    max_iters = dx + dy + 1 
+
+    for _ in range(max_iters):
+        if current_x == x_hit and current_y == y_hit:
             break
-        tmp = e
-        if tmp <= dx:
-            current_y += sy
-            e += 2 *dx
-            
-        if tmp >= -dy:
+
+        e2 = 2 * e
+        
+        if e2 > -dy:
+            e -= dy
             current_x += sx
-            e -= 2 * dy 
+
+        if e2 < dx:
+            e += dx
+            current_y += sy
 
         path.append((current_x, current_y))
+        
     return path
 
 def main():

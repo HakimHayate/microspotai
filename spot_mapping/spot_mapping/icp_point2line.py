@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-from se2 import v2t, project
+from se2 import t2v, v2t, project
 
 def find_line(points, k=100, thresh=0.01, min_pts=10):
     R = np.array([
@@ -32,51 +32,67 @@ def find_line(points, k=100, thresh=0.01, min_pts=10):
 
     return best_line, normal
 
-def extract_all_lines(points, max_iteration=100):
+def extract_all_lines(points, thresh= 0.01, max_iteration=100):
     normals = []
     lines = []
     for _ in range(max_iteration):
-        best_line, normal = find_line(points)
+        best_line, normal = find_line(points,thresh=thresh)
         if normal is None or len(best_line) == 0:
             continue
         normals.append(normal)
         lines.append(np.mean(best_line, axis=0))
 
-        distances = np.linalg.norm(points[:, None] - best_line, axis=2)
-        min_distances = np.min(distances, axis=1)
+        distances = np.abs((points - np.mean(best_line, axis=0)) @ normal.T)
         
-        points = points[min_distances > 1e-6]
+        points = points[distances > thresh]
     
-    return normals, np.array(lines)
+    return np.array(normals), np.array(lines)
 
 def find_matches(src, dst, tol=0.1):
     normals, lines = extract_all_lines(src)
+    if len(lines) == 0:
+        return None
     distances = np.abs(np.sum((dst[:, None] - lines) * normals, axis=2))
 
     closest_line_indices = np.argmin(distances, axis=1)
     min_distances = np.min(distances, axis=1)
     
     valid_mask = min_distances<tol
-    matched_dst = dst[valid_mask]
 
     valid_line_indices = closest_line_indices[valid_mask]
     matched_lines = lines[valid_line_indices]
     matched_normals = normals[valid_line_indices]
      
-    return matched_lines, matched_dst, matched_normals
+    return matched_lines, valid_mask, matched_normals
 
-def icp_line2point(src, dst, normals, current_pose, alpha=0.01, tol=0.001, max_iterations=100):
+
+from scipy.spatial import cKDTree
+def filter_and_cluster_points(points, threshold=1):
+        if len(points) == 0:
+            return points
+        tree = cKDTree(points)
+        clusters = tree.query_ball_tree(tree, threshold)
+        return np.array([np.mean(points[cluster], axis=0) for cluster in clusters])
+
+
+def icp_point2line(src, dst, guess=np.array([0.0,0.0,0.0]), alpha=0.01, tol=0.01, max_iterations=100): 
     '''
-    src, dst, nornals: Nx2
+    src, dst, normals: Nx2
     '''
+    #src = filter_and_cluster_points(src)
+    res = find_matches(src, project(v2t(guess), dst))
+    if res is None:
+        return guess
+    src, dst_idx, normals = res
+    if len(src) == 0:
+        return guess
+    dst = dst[dst_idx]
     dst_tmp = copy.deepcopy(dst)
     error = np.inf
-
-    N = src.shape[0]
-
+    n = len(src)
     nx = normals[:, 0]
     ny = normals[:, 1]
-
+    current_pose = guess.copy()
     for _ in range(max_iterations):
         tx, ty, theta = current_pose
         J = np.zeros(3)
@@ -89,12 +105,12 @@ def icp_line2point(src, dst, normals, current_pose, alpha=0.01, tol=0.001, max_i
             tmp @ nx,
             tmp @ ny,
             tmp @ dtheta
-        ])
+        ])/n
 
         current_pose -= alpha * J 
         T = v2t(current_pose)
         dst_tmp = project(T, dst)
-        error = np.mean(np.linalg.norm(dst_tmp - src),axis=1)
+        error = np.mean(np.abs(tmp))
         if error < tol:
             break
 

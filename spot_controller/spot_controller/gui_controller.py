@@ -77,9 +77,9 @@ class AppGUI:
             self.ros_node.body_controller_.update_target(self.ros_node.T_world_base_, desired_pose)
 
     def reset_sliders(self):
-        self.x_slider.set(0.0)
-        self.y_slider.set(0.0)
-        self.z_slider.set(self.ros_node.defaultZ_)
+        self.x_slider.set(0.04)
+        self.y_slider.set(0.01)
+        self.z_slider.set(-0.08)
         self.roll_slider.set(0.0)
         self.pitch_slider.set(0.0)
         self.yaw_slider.set(0.0)

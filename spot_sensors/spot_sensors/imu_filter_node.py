@@ -60,8 +60,8 @@ class MyNode(Node):
             10)
         self.imu_pub_ = self.create_publisher(Imu,
                                               '/imu/data',
-                                              10)
-        self.yaw_pub_ = self.create_publisher(Float64, '/imu/yaw', 10)
+                                              20)
+        self.yaw_pub_ = self.create_publisher(Float64, '/imu/yaw', 20)
         
 
     def filter_imu_callback(self, msg):
@@ -71,9 +71,9 @@ class MyNode(Node):
         
         if self.last_time_ is not None:
             dt = current_time - self.last_time_
-            self.yaw_ += angular_velocity.z * dt
+            if np.abs(angular_velocity.z * dt) > np.deg2rad(0.05):
+                self.yaw_ += angular_velocity.z * dt
         
-
         correction_angle = get_correction_angle(linear_acceleration.x,
                                             linear_acceleration.y,
                                             linear_acceleration.z)

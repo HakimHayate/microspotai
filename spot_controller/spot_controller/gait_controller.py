@@ -3,7 +3,7 @@ import numpy as np
 
 class GaitController():
     def __init__(self, solverIk, links,  
-                 B=0.06, H=0.05, hz=100, duration=1):
+                 B=0.1, H=0.04, hz=100, duration=1):
         self.links_ = links
         self.ik_solver_ = solverIk
         self.current_positions = [0.0] * 12
@@ -11,7 +11,7 @@ class GaitController():
         self.B_ = B
         self.H_ = H
 
-        self.coeff_height_ = np.linalg.inv(np.array([ # GOOD 
+        self.coeff_height_ = np.linalg.inv(np.array([ 
             [1, 1, 1, 1],
             [0.5**6, 0.5**5, 0.5**4, 0.5**3],
             [6, 5, 4, 3],
@@ -35,7 +35,7 @@ class GaitController():
             z = thigh_foot[2]
             x = self.B_ / 2 - self.B_ * (t - 1) + thigh_foot[0]
             
-        return x, thigh_foot[1], z # Keep y at 0 for stability
+        return x, thigh_foot[1], z 
     
  
     def trot_gait(self, thigh_foot):

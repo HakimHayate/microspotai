@@ -42,3 +42,9 @@ def project(T, pts):
     R = T[:2, :2]
     t = T[:2, 2]
     return pts @ R.T + t
+
+def get_R(theta):
+    return np.array([
+        [np.cos(theta), -np.sin(theta)],
+        [np.sin(theta), np.cos(theta)]
+    ])

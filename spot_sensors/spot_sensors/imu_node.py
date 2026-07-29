@@ -13,7 +13,7 @@ class ImuNode(Node):
 
         self.imu_publisher_ = self.create_publisher(Imu, '/imu/data_raw', 10)
 
-        self.timer_ = self.create_timer(0.05, self.imu_callback) 
+        self.timer_ = self.create_timer(0.01, self.imu_callback) 
         
         self.calibration_pathfile_ = 'imu_calibration.json'
 
