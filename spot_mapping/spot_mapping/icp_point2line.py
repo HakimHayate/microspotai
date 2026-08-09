@@ -75,7 +75,7 @@ def filter_and_cluster_points(points, threshold=1):
         return np.array([np.mean(points[cluster], axis=0) for cluster in clusters])
 
 
-def icp_point2line(src, dst, guess=np.array([0.0,0.0,0.0]), alpha=0.01, tol=0.01, max_iterations=100): 
+def icp_point2line(src, dst, guess=np.array([0.0,0.0,0.0]), alpha=0.01, tol=0.001, max_iterations=100): 
     '''
     src, dst, normals: Nx2
     '''

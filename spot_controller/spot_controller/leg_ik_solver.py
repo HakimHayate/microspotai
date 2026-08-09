@@ -29,7 +29,6 @@ class LegIKSolver:
         alpha = math.atan2(x, -z)
         theta_thigh = beta + alpha
         theta_knee = math.pi - gamma
-
         return theta_hip, theta_thigh, theta_knee 
 
 

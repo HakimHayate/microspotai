@@ -7,7 +7,7 @@ from body_controller import BodyController
 from gait_controller import GaitController
 from sensor_msgs.msg import JointState, Imu
 import numpy as np
-from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Float64MultiArray, String
 from leg_ik_solver import LegIKSolver
 from stabilizer import Stabilizer
 from scipy.spatial.transform import Rotation as R
@@ -18,7 +18,7 @@ from ament_index_python.packages import get_package_share_directory
 import os
 import pinocchio as pin
 from rotate_controller import RotateController
-
+import json
 
 class ControllerNode(Node):
     """The ROS 2 Node logic"""
@@ -45,6 +45,10 @@ class ControllerNode(Node):
             [0, 0, 0, 1]
         ])
 
+        self.B_ = 0.06
+        self.H_ = 0.03
+        self.swing_time_ = 1.0
+
         self.isWalking = False
         self.isStanding = False
         self.isRotating = False
@@ -69,13 +73,12 @@ class ControllerNode(Node):
         self.T_world_base_ = None
         self.body_controller_ = BodyController(self, self.model_, self.data_, self.links_)
 
-        self.gait_controller_ = GaitController(self.solver_, self.links_)
         self.rotate_controller_ = RotateController(self.solver_, self.links_, self.T_base_thigh_, self.T_world_base_)
 
         self.stabilizer_ = Stabilizer(self.T_base_thigh_)
-        self.timer_ = self.create_timer(0.01, self.control_loop)
+        self.timer_ = self.create_timer(0.02, self.control_loop)
 
-        self.joint_state_pub_ = self.create_publisher(JointState, '/joint_states', 10)
+        self.joint_state_pub_ = self.create_publisher(JointState, '/joint_states', 1)
         self.gazebo_pub_ = self.create_publisher(Float64MultiArray, '/raw_position_bridge/commands', 10)
         self.imu_sub_ = self.create_subscription(Imu,
                                               '/imu/data',
@@ -96,8 +99,10 @@ class ControllerNode(Node):
         #self.arm_controller_ = ArmController()
 
         self.dir_motor_ = {'front_right' : 1, 'back_right' : 1,
-                           'front_left' : -1, 'back_left' : -1}
-    
+                           'front_left' : 1, 'back_left' : 1}
+        self.cmd_pub_ = self.create_publisher(String, '/robot_commands', 1)
+        self.pc_thigh_foot_pub_ = self.create_publisher(Float64MultiArray, '/pc_thigh_foot', 1)
+
     def arm_pose_callback(self, msg):
         self.arm_controller_.x_desired_ = list(msg.data[:6])
         self.arm_controller_.end_effector = np.array(msg.data[6:])
@@ -144,14 +149,11 @@ class ControllerNode(Node):
         thigh_foot_correct = None
         
         if self.isWalking:
-            thigh_foot = self.gait_controller_.trot_gait(self.thigh_foot_)
-            if thigh_foot is None:
-                self.isWalking = False
-            thigh_foot_correct = self.stabilize(thigh_foot)
+            return
 
         elif self.isStanding:
             self.thigh_foot_, self.T_world_base_= self.body_controller_.body_pose()
-            thigh_foot_correct = self.stabilize()
+            thigh_foot_correct = self.thigh_foot_ #self.stabilize()
 
         elif self.isRotating:
             thigh_foot = self.rotate_controller_.rotate(self.thigh_foot_, self.T_world_base_)
@@ -188,32 +190,59 @@ class ControllerNode(Node):
             cmd_robot.name = self.joint_names_
             cmd_robot.position = command
             self.joint_state_pub_.publish(cmd_robot)
+
+            flat_coords = []
+            for link in self.links_: # ['front_right', 'back_right', 'back_left', 'front_left']
+                flat_coords.extend(thigh_foot_correct[link])
             
+            # Publish coordinates to the Pi
+            msg = Float64MultiArray()
+            msg.data = [float(val) for val in flat_coords] # Ensure they are standard floats
+            self.pc_thigh_foot_pub_.publish(msg)
+            
+
+    def send_command(self, mode_name):
+        """Sends JSON command to the Pi with mode and gait parameters."""
+        command_data = {
+            "mode": mode_name,
+            "B": getattr(self, 'B_', 0.06),
+            "H": getattr(self, 'H_', 0.03),
+            "duration": getattr(self, 'duration_', 2.0),
+            "swing_time": getattr(self, 'swing_time_', 1.0)
+        }
+        msg = String()
+        msg.data = json.dumps(command_data)
+        self.cmd_pub_.publish(msg)
 
     def off_mode(self):
         self.isWalking = False
         self.isStanding = False
         self.isRotating = False
+        self.isArmMoving = False
 
     def trot_gait_mode(self):
-        self.get_logger().info('Executing walking...')
+        self.get_logger().info('Executing walking on Pi...')
         self.off_mode()
         self.isWalking = True
+        self.send_command("walk")  
     
     def standing_mode(self):
-        self.get_logger().info('Executing standing...')
+        self.get_logger().info('Executing standing on PC...')
         self.off_mode()
         self.isStanding = True
+        self.send_command("pc_control")  # <-- Tell Pi to listen to PC coordinates
 
     def rotating_mode(self):
-        self.get_logger().info('Executing rotating...')
+        self.get_logger().info('Executing rotating on PC...')
         self.off_mode()
         self.isRotating = True
+        self.send_command("pc_control")
     
     def arm_mode(self):
         self.get_logger().info('Arm controlling...')
         self.off_mode()
         self.isArmMoving = True
+        self.send_command("pc_control")
 
 
 def main(args=None):

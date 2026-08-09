@@ -1,6 +1,9 @@
 import rclpy
 from rclpy.node import Node
 
+from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped
+
 from nav_msgs.msg import OccupancyGrid, Path
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Float32MultiArray
@@ -13,10 +16,13 @@ from graph import Graph
 from se2 import *
 import math
 
+from icp_point2line import icp_point2line
+
 class SLAMBackendNode(Node):
     def __init__(self):
         super().__init__('slam_backend_node')
-
+        self.path_pub = self.create_publisher(Path, '/robot_path', 10)
+        self.path = []
         self.graph = Graph()
         self.global_map = OccupancyGridMap()
         self.last_node_id = None
@@ -63,7 +69,7 @@ class SLAMBackendNode(Node):
         grid.info.origin.orientation.z = 0.0
         grid.info.origin.orientation.w = 1.0
 
-        flat_data = self.global_map.map_.flatten()
+        flat_data = self.global_map.map_.T.flatten()
         grid.data = self.compress(flat_data)
         
         self.map_pub.publish(grid)
@@ -83,6 +89,7 @@ class SLAMBackendNode(Node):
         else:
             delta_mvt = relative(self.latest_raw_pose, current_raw_pose)
             pose_optimized = t2v(v2t(self.graph.nodes_dict_[self.last_node_id].pose_) @ v2t(delta_mvt)) 
+            print(f'current pose {pose_optimized}')
             node_id = self.graph.add_node(pose_optimized, current_pts)
             
             self.graph.add_edge(self.last_node_id, node_id, delta_mvt)
@@ -91,6 +98,7 @@ class SLAMBackendNode(Node):
             pts_map = self.global_map.world_to_grid_vectorized(global_pts)
             robot_pos_map = self.global_map.world_to_grid(pose_optimized[0], pose_optimized[1])
             self.global_map.update(pts_map, robot_pos_map)
+            self.pub_path(pose_optimized)
             
 
         self.process_loop_closures(node_id)
@@ -106,12 +114,77 @@ class SLAMBackendNode(Node):
         
         if len(candidates) > 0:
             for id in candidates:
-                pose, _, _, _ = self.global_map.match(self.graph.nodes_dict_[id].pose_, self.graph.nodes_dict_[id].pts_)
-                measurement = relative(pose, self.graph.nodes_dict_[new_node_id].pose_)
-                self.graph.add_edge(id, new_node_id, measurement)
+                temp_map = OccupancyGridMap()
+                window_size = 5
+                start_idx = max(0, id - window_size)
+                end_idx = min(len(self.graph.nodes_dict_), id + window_size + 1)
+                
+                for window_id in range(start_idx, end_idx):
+                    pose = self.graph.nodes_dict_[window_id].pose_
+                    pts = self.graph.nodes_dict_[window_id].pts_
+                    
+                    projected_pts = project(v2t(pose), pts)
+                    temp_map.update(
+                        temp_map.world_to_grid_vectorized(projected_pts), 
+                        temp_map.world_to_grid(pose[0], pose[1])
+                    )
+                measurement, score, _, _ = temp_map.match(
+                    relative(self.graph.nodes_dict_[id].pose_, self.graph.nodes_dict_[new_node_id].pose_), 
+                    self.graph.nodes_dict_[new_node_id].pts_, x_range_pixels=10, y_range_pixels=10
+                )
+                self.graph.add_edge(id, new_node_id, measurement, is_loop_closure=True)
+
             magic_optimizer(self.graph)
             self.global_map.rebuild(self.graph)
+            self.rebuild_path()
             
+    def rebuild_path(self):
+        self.path = []
+        path_msg = Path()
+        path_msg.header.stamp = self.get_clock().now().to_msg()
+        path_msg.header.frame_id = 'map'
+        
+        sorted_node_ids = sorted(self.graph.nodes_dict_.keys(), key=int)
+        
+        for n_id in sorted_node_ids:
+            pose_ = self.graph.nodes_dict_[n_id].pose_
+            
+            p = PoseStamped()
+            p.header.frame_id = 'map'
+            
+            p.pose.position.x = float(pose_[0])
+            p.pose.position.y = float(pose_[1])
+            p.pose.position.z = 0.0
+            
+            p.pose.orientation.x = 0.0
+            p.pose.orientation.y = 0.0
+            p.pose.orientation.z = math.sin(pose_[2] / 2.0)
+            p.pose.orientation.w = math.cos(pose_[2] / 2.0)
+            
+            self.path.append(p)
+
+        path_msg.poses = self.path
+        self.path_pub.publish(path_msg)
+
+    def pub_path(self, pose):
+        p = PoseStamped()
+        p.header.frame_id = 'map'
+        
+        p.pose.position.x = float(pose[0])
+        p.pose.position.y = float(pose[1])
+        p.pose.position.z = 0.0
+        
+        p.pose.orientation.x = 0.0
+        p.pose.orientation.y = 0.0
+        p.pose.orientation.z = math.sin(pose[2] / 2.0)
+        p.pose.orientation.w = math.cos(pose[2] / 2.0)
+        self.path.append(p)
+
+        path_msg = Path()
+        path_msg.header.stamp = self.get_clock().now().to_msg()
+        path_msg.header.frame_id = 'map'
+        path_msg.poses = self.path
+        self.path_pub.publish(path_msg)
 
     def publish_global_state(self):
         self.pub_map()

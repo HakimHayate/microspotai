@@ -3,6 +3,7 @@ import se2
 
 def residual(xi, xj, zij):
     hij = se2.relative(xi, xj)
+    hij[2] = se2.wrap_angle(hij[2])
     return hij - zij
 
 def cost_function(graph):

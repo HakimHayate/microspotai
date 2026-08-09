@@ -5,26 +5,29 @@ import matplotlib.pyplot as plt
 from se2 import *
 from scipy.ndimage import map_coordinates
 
+import numpy as np
+
 class OccupancyGridMap:
-    def __init__(self, width=30, height=30, resolution=0.05): # width & height in m
-        self.offsets = np.array([
-            [0, 0], 
-            [-1, 0], [1, 0], [0, -1], [0, 1], 
-            [-1, -1], [-1, 1], [1, -1], [1, 1], 
-            [-2, 0], [2, 0], [0, -2], [0, 2]
-        ])
-        self.weights = np.array([
-            1.0, 
-            0.7, 0.7, 0.7, 0.7, 
-            0.3, 0.3, 0.3, 0.3, 
-            0.2, 0.2, 0.2, 0.2
-        ])
+    def __init__(self, width=50, height=50, resolution=0.05): # width & height in m
+        
         self.width_cells_ = int(width/resolution)
         self.height_cells_ = int(height/resolution)
         self.resolution_ = resolution
     
         self.map_ = np.zeros((self.width_cells_, self.height_cells_), dtype=np.float16)
         self.max_ = 10 
+
+        radius = 3
+
+        x = np.arange(-radius, radius + 1)
+        y = np.arange(-radius, radius + 1)
+        xx, yy = np.meshgrid(x, y)
+
+        self.offsets = np.c_[xx.ravel(), yy.ravel()]
+
+        distances = np.linalg.norm(self.offsets, axis=1)
+
+        self.weights = np.maximum(0.0, 1.0 - (distances / (radius + 1.0)))
 
         self.origin_x_ = self.width_cells_ // 2
         self.origin_y_ = self.height_cells_ // 2
@@ -98,11 +101,11 @@ class OccupancyGridMap:
         
         return np.dot(map_values[occupied], valid_weights[occupied])
 
-    def match(self, initial_pose, pts, x_range_pixels=6, y_range_pixels=6, theta_range=np.deg2rad(30), angular_resolution= np.deg2rad(5)):
+    def match(self, initial_pose, pts, x_range_pixels=2, y_range_pixels=2, theta_range=np.deg2rad(15), angular_resolution= np.deg2rad(1)):
         x_search = range(-x_range_pixels, x_range_pixels+1)
         y_search = range(-y_range_pixels, y_range_pixels+1)
         theta_search = np.arange(-theta_range, theta_range, angular_resolution)
-
+        #pts = filter_lidar_ransac(pts)
         R = get_R(initial_pose[2])
 
         global_pts = pts @ R.T + initial_pose[:2]

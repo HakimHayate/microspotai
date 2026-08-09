@@ -9,16 +9,17 @@ class PoseNode:
         self.id_ = id
         self.pose_ = np.array(pose, dtype=float)
         self.pts_ = pts
-
+        
     def __repr__(self):
         return f"{self.id_}: ({self.pose_[0]:.2f}, {self.pose_[1]:.2f}, {self.pose_[2]:.2f})"
 
 
 class Edge:
-    def __init__(self, id_source, id_destination, measurement): # z : x, y, theta
+    def __init__(self, id_source, id_destination, measurement, is_loop_closure): # z : x, y, theta
         self.id_source_ = id_source
         self.id_destination_ = id_destination
         self.measurement_ = np.array(measurement, dtype=float)
+        self.is_loop_closure = is_loop_closure
 
 
 class Graph:
@@ -33,10 +34,10 @@ class Graph:
         self.free_id_ += 1
         return node.id_
 
-    def add_edge(self, id_source, id_destination, measurement):
-        self.edges_.append(Edge(id_source, id_destination, measurement))
+    def add_edge(self, id_source, id_destination, measurement, is_loop_closure=False):
+        self.edges_.append(Edge(id_source, id_destination, measurement, is_loop_closure))
 
-    def check_loop_closure(self, current_node_id, tol_translation=1, tol_rotation=np.deg2rad(5), mid_nodes = 50):
+    def check_loop_closure(self, current_node_id, tol_translation=0.5, mid_nodes = 50):
         condidates = []
         current_node = self.nodes_dict_[current_node_id]
         for id in self.nodes_dict_:
@@ -44,8 +45,7 @@ class Graph:
                 continue
             node = self.nodes_dict_[id]
             dist = np.linalg.norm (node.pose_[:2] - current_node.pose_[:2])
-            angle = abs(wrap_angle(node.pose_[2] - current_node.pose_[2]))
-            if dist < tol_translation and angle < tol_rotation:
+            if dist < tol_translation:
                 condidates.append(id)
         return condidates
     

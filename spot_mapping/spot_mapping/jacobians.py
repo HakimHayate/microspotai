@@ -43,7 +43,6 @@ def compute_gradient_analytical(graph):
 
 from residuals import cost_function
 
-
 def compute_gradient_numerical(graph, eps=1e-4):
     gradient_J = np.zeros((len(graph.nodes_dict_)*3))
     cost = cost_function(graph)

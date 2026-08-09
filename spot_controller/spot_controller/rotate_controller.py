@@ -50,7 +50,6 @@ class RotateController():
         return x, y, z 
     
     def update_base(self, T_world_base):
-        print(T_world_base)
         self.T_world_base_ = T_world_base
 
 

@@ -57,7 +57,7 @@ class RealRobotHardwareBridge(Node):
                 self.fast_lookup[std_name] = (servo_obj, offset, dir_mult)
 
         self.subscription = self.create_subscription(
-            JointState, '/joint_states', self.joint_state_callback, 10
+            JointState, '/joint_states', self.joint_state_callback, 1
         )
 
         self.get_logger().info('Hardware bridge initialized')

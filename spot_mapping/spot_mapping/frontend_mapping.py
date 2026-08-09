@@ -29,9 +29,13 @@ class FrontEndNode(Node):
         self.local_map = OccupancyGridMap()
         self.pose = np.zeros(3)
         self.prev_pose = np.zeros(3)
+        self.prev_pose_backend = np.zeros(3)
+        self.prev_yaw = 0.0
         self.current_yaw = 0.0
         self.init = True
         self.guess = np.zeros(3)
+
+        self.accumulated_dist = 0
         
         self.sub_imu_yaw = self.create_subscription(
             Float64,
@@ -72,16 +76,22 @@ class FrontEndNode(Node):
         self.new_pts = True
 
         self.guess[:2] = self.pose[:2]
-        self.guess[-1] = self.current_yaw
+        self.guess[-1] = wrap_angle(self.pose[2]+self.current_yaw - self.prev_yaw)
 
         self.pose, score, pts_map, robot_pos_map = self.local_map.match(self.guess, pts)
-        print(f'global pose {self.pose}\n')
+        print(f'pose = {self.pose}, accumulated dist = {self.accumulated_dist}')
+        self.prev_yaw = self.current_yaw
         
-        
-        if not self.init and np.linalg.norm(self.pose[:2] - self.prev_pose[:2]) < 0.1 and abs(self.pose[2] - self.prev_pose[2]) < np.deg2rad(0.5):
+        if not self.init and np.linalg.norm(self.pose[:2] - self.prev_pose[:2]) < 0.1 and abs(self.pose[2] - self.prev_pose[2]) < np.deg2rad(1):
             pass
         else:
-            self.pub_keyframe(self.pose, pts)
+            if np.linalg.norm(self.pose[:2] - self.prev_pose_backend[:2]) > 0.2:
+                self.pub_keyframe(self.pose, pts)
+                self.prev_pose_backend = self.pose.copy()
+            self.accumulated_dist += np.linalg.norm(self.pose[:2] - self.prev_pose[:2])
+
+            
+
             self.local_map.update(pts_map, robot_pos_map)
             self.prev_pose = self.pose.copy()
             if self.init:
