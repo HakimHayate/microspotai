@@ -197,7 +197,7 @@ class ControllerNode(Node):
             
             # Publish coordinates to the Pi
             msg = Float64MultiArray()
-            msg.data = [float(val) for val in flat_coords] # Ensure they are standard floats
+            msg.data = [float(val) for val in flat_coords] 
             self.pc_thigh_foot_pub_.publish(msg)
             
 
@@ -208,7 +208,8 @@ class ControllerNode(Node):
             "B": getattr(self, 'B_', 0.06),
             "H": getattr(self, 'H_', 0.03),
             "duration": getattr(self, 'duration_', 2.0),
-            "swing_time": getattr(self, 'swing_time_', 1.0)
+            "swing_time": getattr(self, 'swing_time_', 1.0),
+            "turn_rate": getattr(self, 'turn_rate_', 0.0)
         }
         msg = String()
         msg.data = json.dumps(command_data)
@@ -230,7 +231,7 @@ class ControllerNode(Node):
         self.get_logger().info('Executing standing on PC...')
         self.off_mode()
         self.isStanding = True
-        self.send_command("pc_control")  # <-- Tell Pi to listen to PC coordinates
+        self.send_command("pc_control")  
 
     def rotating_mode(self):
         self.get_logger().info('Executing rotating on PC...')

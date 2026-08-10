@@ -33,7 +33,7 @@ class AppGUI:
         tk.Label(root, text="Gait Tuning (Walk Mode Only)", font=("Helvetica", 12, "bold")).pack(pady=(15, 0))
 
         # Stride Length (B)
-        self.stride_slider = tk.Scale(root, from_=0.01, to=0.15, resolution=0.01, orient=tk.HORIZONTAL, label="Stride Length (B)", length=300, command=self.on_gait_change)
+        self.stride_slider = tk.Scale(root, from_=0.0, to=0.15, resolution=0.01, orient=tk.HORIZONTAL, label="Stride Length (B)", length=300, command=self.on_gait_change)
         self.stride_slider.set(0.04) # Default safe value
         self.stride_slider.pack()
 
@@ -50,6 +50,10 @@ class AppGUI:
         self.swing_time_slider = tk.Scale(root, from_=0.2, to=2.0, resolution=0.1, orient=tk.HORIZONTAL, label="Swing Time (Max 4.0)", length=300, command=self.on_gait_change)
         self.swing_time_slider.set(0.8) # Default: 20% swing, 80% stance
         self.swing_time_slider.pack()
+
+        self.turn_slider = tk.Scale(root, from_=-0.1, to=0.1, resolution=0.01, orient=tk.HORIZONTAL, label="Turn Rate (L <-> R)", length=300, command=self.on_gait_change)
+        self.turn_slider.set(0.0) 
+        self.turn_slider.pack()
 
         # --- BODY POSE SLIDERS ---
         tk.Label(root, text="Body Pose Adjustments (Stand Mode Only)", font=("Helvetica", 12, "bold")).pack(pady=(15, 0))
@@ -87,14 +91,15 @@ class AppGUI:
         new_H = float(self.height_slider.get())
         new_duration = float(self.duration_slider.get())
         new_swing_time = float(self.swing_time_slider.get())
-        
+        new_turn = float(self.turn_slider.get())
         # Only update and send if we are safely standing or idle (NOT walking)
         if getattr(self.ros_node, 'isStanding', False):
             self.ros_node.B_ = new_B
             self.ros_node.H_ = new_H
             self.ros_node.duration_ = new_duration
             self.ros_node.swing_time_ = new_swing_time
-            
+            self.ros_node.turn_rate_ = new_turn
+
             # Send the updated parameters to the Pi immediately over JSON
             if hasattr(self.ros_node, 'send_command'):
                 self.ros_node.send_command("pc_control")
