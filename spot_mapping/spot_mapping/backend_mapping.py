@@ -15,7 +15,7 @@ from map_manager import OccupancyGridMap
 from graph import Graph
 from se2 import *
 import math
-
+from pathfinding import PathFinding
 from icp_point2line import icp_point2line
 
 class SLAMBackendNode(Node):
@@ -27,6 +27,7 @@ class SLAMBackendNode(Node):
         self.global_map = OccupancyGridMap()
         self.last_node_id = None
         self.latest_raw_pose = None
+        self.pathfinder = PathFinding(self.global_map)
 
         self.keyframe_sub = self.create_subscription(
             Float32MultiArray,
@@ -35,12 +36,55 @@ class SLAMBackendNode(Node):
             10
         )
 
+        self.data_planning_pub = self.create_publisher(Float32MultiArray, '/current_pose', 10)
         self.map_pub = self.create_publisher(OccupancyGrid, '/map', 10)
         self.path_pub = self.create_publisher(Path, '/robot_path', 10)
+        self.planned_path_pub = self.create_publisher(Path, '/planned_path', 10)
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
+        self.goal_sub = self.create_subscription(
+            PoseStamped,
+            '/goal_pose', 
+            self.goal_callback,
+            10
+        )
+
+
+
         self.get_logger().info("SLAM Backend Initialized.")
+
+    def goal_callback(self, msg):
+        dest_x = msg.pose.position.x
+        dest_y = msg.pose.position.y
+        dst_pose_map = self.global_map.world_to_grid(dest_x, dest_y)
+        current_pose_map = self.global_map.world_to_grid(self.latest_raw_pose[0],self.latest_raw_pose[1])
+        path_map = self.pathfinder.get_path(current_pose_map, dst_pose_map)
+        path_world = self.global_map.grid_to_world(path_map)
+
+        path_msg = Path()
+        path_msg.header.stamp = self.get_clock().now().to_msg()
+        path_msg.header.frame_id = 'map'
+        planned_poses = []
+        
+        for pose in path_world:
+            
+            p = PoseStamped()
+            p.header.stamp = path_msg.header.stamp
+            p.header.frame_id = 'map'
+            
+            p.pose.position.x = float(pose[0])
+            p.pose.position.y = float(pose[1])
+            p.pose.position.z = 0.0
+            
+            p.pose.orientation.x = 0.0
+            p.pose.orientation.y = 0.0
+            p.pose.orientation.z = 0.0
+            p.pose.orientation.w = 1.0
+            planned_poses.append(p)
+
+        path_msg.poses = planned_poses
+        self.planned_path_pub.publish(path_msg)
 
     def compress(self, data):
         ros_data = np.full(data.shape, -1, dtype=np.int8)
@@ -76,7 +120,12 @@ class SLAMBackendNode(Node):
 
     def keyframe_callback(self, msg):
         raw_data = np.array(msg.data, dtype=np.float32)
-        current_raw_pose = raw_data[:3]
+        current_raw_pose = raw_data[:3].tolist()
+
+        msg = Float32MultiArray()
+        msg.data = current_raw_pose
+        self.data_planning_pub.publish(msg)
+
         current_pts = raw_data[3:].reshape(-1, 2)
 
 
@@ -101,7 +150,7 @@ class SLAMBackendNode(Node):
             self.pub_path(pose_optimized)
             
 
-        self.process_loop_closures(node_id)
+        #self.process_loop_closures(node_id)
 
         self.latest_raw_pose = current_raw_pose
         self.last_node_id = node_id

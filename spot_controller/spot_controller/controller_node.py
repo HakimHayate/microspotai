@@ -49,13 +49,20 @@ class ControllerNode(Node):
         self.H_ = 0.03
         self.swing_time_ = 1.0
 
+        self.isSitting = True
         self.isWalking = False
         self.isStanding = False
         self.isRotating = False
         self.isArmMoving = False
-
+        self.auto_mode_ = False
         self.mode_swap_ = False
         self.swap_initiated_ = False
+
+        self.sit_pose_1 = {'x':-0.01, 'y':0.0, 'z':-0.213}
+        self.sit_pose_2 = {'x':-0.01, 'y':-0.025, 'z':-0.213}
+
+        self.standup_pose_1 = {'x':-0.01, 'y':0.0, 'z':-0.213}
+        self.standup_pose_2 = {'x':0.03, 'y':0.0, 'z':-0.10}
 
         self.tf_buffer_ = Buffer()
         self.tf_listener_ = TransformListener(self.tf_buffer_, self)
@@ -68,10 +75,14 @@ class ControllerNode(Node):
         self.model_ = pin.buildModelFromXML(robot_desc)
         self.data_ = self.model_.createData()
 
+        self.stand_pose_saved = False
+
         self.T_base_thigh_ = None
         self.thigh_foot_ = None
-        self.T_world_base_ = None
+        
+
         self.body_controller_ = BodyController(self, self.model_, self.data_, self.links_)
+        self.T_world_base_ = self.body_controller_.set_initial_pose(self.sit_pose_2)
 
         self.rotate_controller_ = RotateController(self.solver_, self.links_, self.T_base_thigh_, self.T_world_base_)
 
@@ -95,13 +106,25 @@ class ControllerNode(Node):
             10
         )
 
+        
+
+        self.sit_pose_1_in_progress  = False
+        self.sit_pose_2_in_progress  = False
+        self.isSitting_mode = True
+
+        self.standup_pose_1_in_progress  = False
+        self.standup_pose_2_in_progress  = False
+        self.isStandingUp_mode = False
+        
         self.current_angles_ = [0]*12
         #self.arm_controller_ = ArmController()
 
         self.dir_motor_ = {'front_right' : 1, 'back_right' : 1,
                            'front_left' : 1, 'back_left' : 1}
+        
         self.cmd_pub_ = self.create_publisher(String, '/robot_commands', 1)
         self.pc_thigh_foot_pub_ = self.create_publisher(Float64MultiArray, '/pc_thigh_foot', 1)
+        self.mode_publisher_ = self.create_publisher(String, '/robot_mode', 10)
 
     def arm_pose_callback(self, msg):
         self.arm_controller_.x_desired_ = list(msg.data[:6])
@@ -125,7 +148,7 @@ class ControllerNode(Node):
             command[idx:idx+3] = q
         return command
     
-    def stabilize(self, thigh_foot=None):
+    def stabilize(self, thigh_foot=None, alpha=0.4):
         thigh_foot = thigh_foot if thigh_foot is not None else self.thigh_foot_
 
         thigh_foot_corrected = {}
@@ -140,10 +163,55 @@ class ControllerNode(Node):
         error = self.stabilizer_.compute_error(roll_sensor, pitch_sensor, self.T_world_base_, self.thigh_foot_, self.links_)
 
         for link in self.links_:
-            thigh_foot_corrected[link] = thigh_foot[link] - error[link]
+            thigh_foot_corrected[link] = thigh_foot[link] - alpha * error[link]
         
         return thigh_foot_corrected
     
+    def sit(self):
+        if self.isSitting:
+            return None
+
+        if not self.stand_pose_saved:
+            self.stand_pose_saved = True
+            self.last_T_stand = self.body_controller_.T_target_
+
+        if not self.sit_pose_1_in_progress and not self.sit_pose_2_in_progress:
+            self.sit_pose_1_in_progress  = True
+            self.body_controller_.update_target(self.T_world_base_, self.sit_pose_1)
+
+        if self.sit_pose_1_in_progress and self.body_controller_.reached_target_:
+            self.sit_pose_1_in_progress  = False
+            self.sit_pose_2_in_progress  = True
+            self.body_controller_.update_target(self.T_world_base_, self.sit_pose_2)
+
+        if self.sit_pose_2_in_progress and self.body_controller_.reached_target_:
+            self.sit_pose_2_in_progress  = False
+            self.isSitting  = True
+            self.get_logger().info('Robot sat down')
+
+        return self.body_controller_.body_pose()
+    
+    def standup(self):
+        if not self.isSitting:
+            return None
+        
+        if not self.standup_pose_1_in_progress and not self.standup_pose_2_in_progress:
+            self.standup_pose_1_in_progress  = True
+            self.body_controller_.update_target(self.T_world_base_, self.standup_pose_1)
+
+        if self.standup_pose_1_in_progress and self.body_controller_.reached_target_:
+            self.standup_pose_1_in_progress  = False
+            self.standup_pose_2_in_progress  = True
+            self.body_controller_.update_target(self.T_world_base_, self.standup_pose_2)
+
+        if self.standup_pose_2_in_progress and self.body_controller_.reached_target_:
+            self.standup_pose_2_in_progress  = False
+            self.isStandingUp_mode  = False
+            self.isSitting = False
+            self.isStanding = True
+            self.get_logger().info('Robot is standing!')
+
+        return self.body_controller_.body_pose()
 
     def control_loop(self):
         thigh_foot_correct = None
@@ -151,9 +219,12 @@ class ControllerNode(Node):
         if self.isWalking:
             return
 
+        if self.auto_mode_:
+            return
+        
         elif self.isStanding:
             self.thigh_foot_, self.T_world_base_= self.body_controller_.body_pose()
-            thigh_foot_correct = self.thigh_foot_ #self.stabilize()
+            thigh_foot_correct = self.stabilize()
 
         elif self.isRotating:
             thigh_foot = self.rotate_controller_.rotate(self.thigh_foot_, self.T_world_base_)
@@ -161,6 +232,21 @@ class ControllerNode(Node):
                 self.isRotating = False
             thigh_foot_correct = thigh_foot
 
+        elif self.isSitting_mode:
+            res = self.sit()
+            if res is None:
+                return
+            self.thigh_foot_, self.T_world_base_= res
+            thigh_foot_correct = self.thigh_foot_ #self.stabilize()
+
+        elif self.isStandingUp_mode:
+            res = self.standup()
+            if res is None:
+                return
+            self.thigh_foot_, self.T_world_base_= res
+            thigh_foot_correct = self.thigh_foot_
+
+        """
         elif self.isArmMoving:
             res = self.arm_controller_.control_loop()
             if res is None:
@@ -173,8 +259,7 @@ class ControllerNode(Node):
             self.joint_state_pub_.publish(cmd_arm)
             return
 
-        else:
-            pass # To do
+        """
             
         if thigh_foot_correct is not None:
             command = self.get_command(thigh_foot=thigh_foot_correct)
@@ -202,7 +287,6 @@ class ControllerNode(Node):
             
 
     def send_command(self, mode_name):
-        """Sends JSON command to the Pi with mode and gait parameters."""
         command_data = {
             "mode": mode_name,
             "B": getattr(self, 'B_', 0.06),
@@ -220,21 +304,34 @@ class ControllerNode(Node):
         self.isStanding = False
         self.isRotating = False
         self.isArmMoving = False
+        self.auto_mode_ = False
+        self.isSitting_mode = False
+        self.isStandingUp_mode = False
+
+        msg = String()
+        msg.data = "manuel"  
+        self.mode_publisher_.publish(msg)
 
     def trot_gait_mode(self):
-        self.get_logger().info('Executing walking on Pi...')
+        if not self.isStanding:
+            self.get_logger().info('Robot has to stand up!...')
+            return
+        self.get_logger().info('Executing walking...')
         self.off_mode()
         self.isWalking = True
         self.send_command("walk")  
     
     def standing_mode(self):
-        self.get_logger().info('Executing standing on PC...')
+        if self.isSitting_mode:
+            self.get_logger().info('Robot has to stand up...')
+            return
+        self.get_logger().info('Executing standing...')
         self.off_mode()
         self.isStanding = True
         self.send_command("pc_control")  
 
     def rotating_mode(self):
-        self.get_logger().info('Executing rotating on PC...')
+        self.get_logger().info('Executing rotating...')
         self.off_mode()
         self.isRotating = True
         self.send_command("pc_control")
@@ -245,6 +342,29 @@ class ControllerNode(Node):
         self.isArmMoving = True
         self.send_command("pc_control")
 
+    def sit_mode(self):
+        if not self.isStanding:
+            self.get_logger().info('Robot already Sitting down...')
+            return
+        self.get_logger().info('Sitting down...')
+        self.off_mode()
+        self.isSitting_mode = True
+
+    def standUp_mode(self):
+        if not self.isSitting:
+            self.get_logger().info('Already standing up...')
+            return 
+        self.get_logger().info('Standing up...')
+        self.off_mode()
+        self.isStandingUp_mode = True
+        
+    def auto_mode(self):
+        self.get_logger().info('Auto mode...')
+        self.off_mode()
+        self.auto_mode_ = True
+        msg = String()
+        msg.data = "auto"  
+        self.mode_publisher_.publish(msg)
 
 def main(args=None):
     rclpy.init(args=args)

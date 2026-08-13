@@ -49,6 +49,9 @@ class OccupancyGridMap:
     def world_to_grid_vectorized(self, pts):
         return  np.floor(pts / self.resolution_ + self.origin_).astype(np.int32)
 
+    def grid_to_world(self, pts_map):
+        return (pts_map- self.origin_)*self.resolution_
+
     def update(self, pts_map, robot_pos_map):
         grid_x, grid_y = robot_pos_map
 
@@ -142,6 +145,44 @@ class OccupancyGridMap:
             world_pts = project(v2t(node.pose_), node.pts_)
             pts_map = self.world_to_grid_vectorized(world_pts)
             self.update(pts_map, robot_pos_map)
+
+
+    def get_path(self, current_pose_map, dst_pose_map, max_iterations):
+        path = []
+        dir = [1, -1]
+        diag = [[1, 1], [-1, -1], [1, -1], [-1, 1]]
+        pose = current_pose_map.copy()
+        for _ in range(max_iterations):
+            best_next_pos = None
+            best_next_score = np.inf
+            for i in dir:
+                tmp_pose = pose.copy()
+                tmp_pose[0] =+ i
+                score = self.map_[tmp_pose] + np.linalg.norm(tmp_pose - dst_pose_map)
+                if score < best_next_score:
+                    best_next_pos = tmp_pose.copy()
+                    best_next_score = score
+            for i in dir:
+                tmp_pose = pose.copy()
+                tmp_pose[1] =+ i
+                score = self.map_[tmp_pose] + np.linalg.norm(tmp_pose - dst_pose_map)
+                if score < best_next_score:
+                    best_next_pos = tmp_pose.copy()
+                    best_next_score = score
+            for i in diag:
+                tmp_pose = pose.copy()
+                tmp_pose =+ i
+                score = self.map_[tmp_pose] + np.linalg.norm(tmp_pose - dst_pose_map)
+                if score < best_next_score:
+                    best_next_pos = tmp_pose.copy()
+                    best_next_score = score
+            path.append(best_next_pos)
+            pose = best_next_pos.copy()
+
+            if pose == dst_pose_map:
+                return path
+        print("No path found")
+        return None
 
     def plot_map(self):
         prob_map = 1 / (1 + np.exp(-self.map_))

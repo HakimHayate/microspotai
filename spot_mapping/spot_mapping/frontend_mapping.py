@@ -85,9 +85,8 @@ class FrontEndNode(Node):
         if not self.init and np.linalg.norm(self.pose[:2] - self.prev_pose[:2]) < 0.1 and abs(self.pose[2] - self.prev_pose[2]) < np.deg2rad(1):
             pass
         else:
-            if np.linalg.norm(self.pose[:2] - self.prev_pose_backend[:2]) > 0.2:
-                self.pub_keyframe(self.pose, pts)
-                self.prev_pose_backend = self.pose.copy()
+            self.pub_keyframe(self.pose, pts)
+            self.prev_pose_backend = self.pose.copy()
             self.accumulated_dist += np.linalg.norm(self.pose[:2] - self.prev_pose[:2])
 
             

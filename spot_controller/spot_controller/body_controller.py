@@ -12,7 +12,7 @@ import pinocchio as pin
 class BodyController():
     "Idea : Virtually move the base link and keep the foot planted"
     def __init__(self, controller_node, model, data, links, 
-                 duration = .020, dt= 0.02):
+                 duration = 1.0, dt= 0.02):
         
         self.model_ = model
         self.data_ = data
@@ -24,6 +24,7 @@ class BodyController():
         self.reached_target_ = True
 
         self.T_target_ = np.eye(4)
+        
         self.S_ = None
 
         self.q = np.array([0]*12)
@@ -54,13 +55,26 @@ class BodyController():
     def restart(self):
         self.time_elapsed_ = 0
 
-    def update_target(self, T_world_base, desired_pose: dict) -> None:
-        """
-        Calculates the new target transformation matrix and updates the twist trajectory.
+    def set_initial_pose(self, pose):
+        x = pose.get('x', 0)
+        y = pose.get('y', 0)
+        z = pose.get('z', 0)
 
-        Params:
-            desired_pose : dict containing these keys: x, y, z, roll, pitch, yaw in radians
-        """
+        roll = pose.get('roll', 0)
+        pitch = pose.get('pitch', 0)
+        yaw = pose.get('yaw', 0)
+
+        Rxyz = get_rotation(roll, pitch, yaw)
+
+        self.T_world_base_ = self.T_world_base_initially_ @ np.array([
+            [Rxyz[0,0], Rxyz[0,1], Rxyz[0,2], x],
+            [Rxyz[1,0], Rxyz[1,1], Rxyz[1,2], y],
+            [Rxyz[2,0], Rxyz[2,1], Rxyz[2,2], z],
+            [0, 0, 0, 1]
+        ])
+        return self.T_world_base_
+
+    def update_target(self, T_world_base, desired_pose):
 
         x = desired_pose.get('x', 0)
         y = desired_pose.get('y', 0)

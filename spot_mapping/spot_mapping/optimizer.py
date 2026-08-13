@@ -30,8 +30,8 @@ import numpy as np
 
 def compute_linear_system(graph):
     n = len(graph.nodes_dict_)
+
     
-    # UPGRADE: Initialize H as a sparse matrix instead of dense
     H = lil_matrix((3*n, 3*n)) 
     b = np.zeros(3*n)
 
@@ -45,8 +45,6 @@ def compute_linear_system(graph):
         i = edge.id_source_ * 3
         j = edge.id_destination_ * 3
 
-        # This math stays exactly the same! 
-        # The lil_matrix handles the sparse assignment automatically.
         H[i:i+3, i:i+3] += Ji @ Ji.T
         H[i:i+3, j:j+3] += Ji @ Jj.T
         H[j:j+3, i:i+3] += Jj @ Ji.T
@@ -62,13 +60,11 @@ def magic_optimizer(graph, max_iteration=20, tol=1e-6):
 
     for _ in range(max_iteration):
         H, b = compute_linear_system(graph)
-
-        # UPGRADE: Sparse-friendly Gauge Fixing (Soft Anchoring)
-        # Adding a massive weight forces dx for the first pose to be ~0
+        
         H[0:3, 0:3] += np.eye(3) * 1e8 
         b[0:3] = 0
 
-        # UPGRADE: Convert to CSR format and use the sparse solver
+
         dx = spsolve(H.tocsr(), -b)
 
         if np.linalg.norm(dx) < tol:

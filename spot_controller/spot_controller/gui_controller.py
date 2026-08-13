@@ -1,13 +1,12 @@
 import tkinter as tk
 
 class AppGUI:
-    """The Tkinter Graphical Interface"""
     def __init__(self, root, ros_node):
         self.root = root
         self.ros_node = ros_node
         
         self.root.title("Microspot Control Panel")
-        self.root.geometry("550x850") # Made slightly taller to fit new sliders
+        self.root.geometry("550x900") 
         self.root.eval('tk::PlaceWindow . left') 
 
         # --- MODE SELECTION ---
@@ -17,7 +16,7 @@ class AppGUI:
         btn_walk = tk.Button(root, text="Walk", command=ros_node.trot_gait_mode, width=20, bg="#4CAF50", fg="white")
         btn_walk.pack(pady=2)
 
-        btn_stand = tk.Button(root, text="Stand", command=ros_node.standing_mode, width=20, bg="#2196F3", fg="white")
+        btn_stand = tk.Button(root, text="Stand Mode", command=ros_node.standing_mode, width=20, bg="#2196F3", fg="white")
         btn_stand.pack(pady=2)
 
         btn_rotate = tk.Button(root, text="Rotate", command=ros_node.rotating_mode, width=20, bg="#2196F3", fg="white")
@@ -25,37 +24,43 @@ class AppGUI:
 
         btn_arm = tk.Button(root, text="Move Arm", command=ros_node.arm_mode, width=20, bg="#2196F3", fg="white")
         btn_arm.pack(pady=2)
+
+        btn_auto = tk.Button(root, text="Auto", command=ros_node.auto_mode, width=20, bg="#2196F3", fg="white")
+        btn_auto.pack(pady=2)
+
+        btn_sit = tk.Button(root, text="Sit", command=ros_node.sit_mode, width=20, bg="#FF9800", fg="white")
+        btn_sit.pack(pady=2)
+
+        btn_standup = tk.Button(root, text="Standup", command=ros_node.standUp_mode, width=20, bg="#FF9800", fg="white")
+        btn_standup.pack(pady=2)
         
         btn_quit = tk.Button(root, text="Quit Node", command=self.quit_app, width=20, bg="#f44336", fg="white")
         btn_quit.pack(pady=2)
 
-        # --- GAIT TUNING SLIDERS ---
+
         tk.Label(root, text="Gait Tuning (Walk Mode Only)", font=("Helvetica", 12, "bold")).pack(pady=(15, 0))
 
-        # Stride Length (B)
         self.stride_slider = tk.Scale(root, from_=0.0, to=0.15, resolution=0.01, orient=tk.HORIZONTAL, label="Stride Length (B)", length=300, command=self.on_gait_change)
-        self.stride_slider.set(0.04) # Default safe value
+        self.stride_slider.set(0.04) 
         self.stride_slider.pack()
 
-        # Step Height (H)
         self.height_slider = tk.Scale(root, from_=0.01, to=0.10, resolution=0.01, orient=tk.HORIZONTAL, label="Step Height (H)", length=300, command=self.on_gait_change)
-        self.height_slider.set(0.03) # Default safe value
+        self.height_slider.set(0.03) 
         self.height_slider.pack()
 
-        # Cycle Duration
+        
         self.duration_slider = tk.Scale(root, from_=0.5, to=3.0, resolution=0.1, orient=tk.HORIZONTAL, label="Cycle Duration (Seconds)", length=300, command=self.on_gait_change)
-        self.duration_slider.set(1.5) # Default safe value
+        self.duration_slider.set(1.5) 
         self.duration_slider.pack()
 
         self.swing_time_slider = tk.Scale(root, from_=0.2, to=2.0, resolution=0.1, orient=tk.HORIZONTAL, label="Swing Time (Max 4.0)", length=300, command=self.on_gait_change)
-        self.swing_time_slider.set(0.8) # Default: 20% swing, 80% stance
+        self.swing_time_slider.set(0.8) 
         self.swing_time_slider.pack()
 
-        self.turn_slider = tk.Scale(root, from_=-0.1, to=0.1, resolution=0.01, orient=tk.HORIZONTAL, label="Turn Rate (L <-> R)", length=300, command=self.on_gait_change)
+        self.turn_slider = tk.Scale(root, from_=-0.04, to=0.04, resolution=0.005, orient=tk.HORIZONTAL, label="Turn Rate (L <-> R)", length=300, command=self.on_gait_change)
         self.turn_slider.set(0.0) 
         self.turn_slider.pack()
 
-        # --- BODY POSE SLIDERS ---
         tk.Label(root, text="Body Pose Adjustments (Stand Mode Only)", font=("Helvetica", 12, "bold")).pack(pady=(15, 0))
 
         self.x_slider = tk.Scale(root, from_=-0.1, to=0.1, resolution=0.01, orient=tk.HORIZONTAL, label="X", length=300, command=self.on_pose_change)
@@ -66,7 +71,7 @@ class AppGUI:
         self.y_slider.set(0.0)
         self.y_slider.pack()
         
-        self.z_slider = tk.Scale(root, from_=-0.2, to=0.02, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
+        self.z_slider = tk.Scale(root, from_=-0.3, to=0.02, resolution=0.01, orient=tk.HORIZONTAL, label="Z", length=300, command=self.on_pose_change)
         self.z_slider.set(-0.14)
         self.z_slider.pack()
         
@@ -85,14 +90,12 @@ class AppGUI:
         self.root.protocol("WM_DELETE_WINDOW", self.quit_app)
 
     def on_gait_change(self, event=None):
-        """Passes the slider values down to the ROS node to send to the Pi."""
-        # Grab values from sliders
         new_B = float(self.stride_slider.get())
         new_H = float(self.height_slider.get())
         new_duration = float(self.duration_slider.get())
         new_swing_time = float(self.swing_time_slider.get())
         new_turn = float(self.turn_slider.get())
-        # Only update and send if we are safely standing or idle (NOT walking)
+        
         if getattr(self.ros_node, 'isStanding', False):
             self.ros_node.B_ = new_B
             self.ros_node.H_ = new_H
@@ -100,7 +103,6 @@ class AppGUI:
             self.ros_node.swing_time_ = new_swing_time
             self.ros_node.turn_rate_ = new_turn
 
-            # Send the updated parameters to the Pi immediately over JSON
             if hasattr(self.ros_node, 'send_command'):
                 self.ros_node.send_command("pc_control")
 
