@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'robot_arm_controller'
+package_name = 'spotmicro_hardware_controller'
 
 setup(
     name=package_name,
@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer='Abdelhakim Hayate',
     maintainer_email='hakimhayate@gmail.com',
-    description='ROS 2 package to control the arm',
+    description='ROS 2 package for Microspot robot hardware control and bridging.',
     license='Apache-2.0',
     extras_require={
         'test': [
@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'hardware_bridge=spotmicro_hardware_controller.hardware_bridge:main',
         ],
     },
 )

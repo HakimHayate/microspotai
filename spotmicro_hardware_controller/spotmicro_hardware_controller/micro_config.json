@@ -1,0 +1,21 @@
+{
+  "boards": {
+    "pca_1": 64
+  },
+  "servos": {
+    "FL_Hip":   {"board": "pca_1", "pin": 10},
+    "FL_Thigh": {"board": "pca_1", "pin": 9},
+    "FR_Thigh":  {"board": "pca_1", "pin": 13},
+    "FR_Hip":   {"board": "pca_1", "pin":14},
+
+    "FL_Knee": {"board": "pca_1", "pin": 8},
+    "FR_Knee":  {"board": "pca_1", "pin": 12},
+    "BR_Knee":   {"board": "pca_1", "pin": 4},
+    "BL_Hip": {"board": "pca_1", "pin": 2},
+
+    "BR_Hip":  {"board": "pca_1", "pin": 6},
+    "BL_Knee":   {"board": "pca_1", "pin": 0},
+    "BR_Thigh": {"board": "pca_1", "pin": 5},
+    "BL_thigh":  {"board": "pca_1", "pin": 1}
+  }
+}

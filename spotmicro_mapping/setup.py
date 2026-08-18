@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'robot_arm_controller'
+package_name = 'spotmicro_mapping'
 
 setup(
     name=package_name,
@@ -15,15 +15,19 @@ setup(
     zip_safe=True,
     maintainer='Abdelhakim Hayate',
     maintainer_email='hakimhayate@gmail.com',
-    description='ROS 2 package to control the arm',
+    description='ROS 2 package for mapping, ICP, and graph optimization for the Microspot robot.',
     license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',
         ],
     },
+    
     entry_points={
         'console_scripts': [
+            'frontend_mapping=spotmicro_mapping.frontend_mapping:main',
+            'backend_mapping=spotmicro_mapping.backend_mapping:main',
+            'execute_path=spotmicro_mapping.execute_path:main',
         ],
     },
 )

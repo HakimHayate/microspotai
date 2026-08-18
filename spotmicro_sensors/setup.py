@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'robot_arm_controller'
+package_name = 'spotmicro_sensors'
 
 setup(
     name=package_name,
@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer='Abdelhakim Hayate',
     maintainer_email='hakimhayate@gmail.com',
-    description='ROS 2 package to control the arm',
+    description='ROS 2 package containing hardware drivers and data filters for the Microspot LiDAR and IMU sensors.',
     license='Apache-2.0',
     extras_require={
         'test': [
@@ -24,6 +24,10 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'lidar_node=spotmicro_sensors.lidar_node:main',
+            'imu_node=spotmicro_sensors.imu_node:main',
+            'imu_filter_node=spotmicro_sensors.imu_filter_node:main',
+            'imu_yaw_node=spotmicro_sensors.imu_yaw_node:main',
         ],
     },
 )
