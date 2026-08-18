@@ -5,12 +5,17 @@ import math
 import json
 from adafruit_servokit import ServoKit
 import time
+import os
+from ament_index_python.packages import get_package_share_directory
+
 class RealRobotHardwareBridge(Node):
     def __init__(self):
         super().__init__('real_robot_hardware_bridge')
 
-        calibrate_file = 'calibrate.json'
-        micro_config_file = 'micro_config.json'
+        pkg_dir = get_package_share_directory('spotmicro_hardware_controller')
+        calibrate_file = os.path.join(pkg_dir, 'config', 'calibrate.json') 
+
+        micro_config_file = calibrate_file = os.path.join(pkg_dir, 'config', 'micro_config.json')  
 
         try:
             with open(calibrate_file, 'r') as f:
