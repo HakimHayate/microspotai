@@ -1,24 +1,27 @@
-import rclpy
-from rclpy.node import Node
+import os
+import json
 import threading
 import tkinter as tk
-from tf2_ros import Buffer, TransformListener
-from body_controller import BodyController
-from gait_controller import GaitController
-from sensor_msgs.msg import JointState, Imu
 import numpy as np
-from std_msgs.msg import Float64MultiArray, String
-from leg_ik_solver import LegIKSolver
-from stabilizer import Stabilizer
-from scipy.spatial.transform import Rotation as R
-from utils import quaternion_to_rpy
-from gui_controller import AppGUI
-from arm_controller import ArmController
-from ament_index_python.packages import get_package_share_directory
-import os
 import pinocchio as pin
+from scipy.spatial.transform import Rotation as R
+
+from spotmicro_controller.body_controller import BodyController
+from spotmicro_controller.gait_controller import GaitController
+from spotmicro_controller.leg_ik_solver import LegIKSolver
+from spotmicro_controller.stabilizer import Stabilizer
+from spotmicro_controller.utils import quaternion_to_rpy
+from spotmicro_controller.gui_controller import AppGUI
 from spotmicro_controller.rotate_controller import RotateController
-import json
+
+from spotmicro_controller.arm_controller import ArmController
+
+import rclpy
+from rclpy.node import Node
+from tf2_ros import Buffer, TransformListener
+from sensor_msgs.msg import JointState, Imu
+from std_msgs.msg import Float64MultiArray, String
+from ament_index_python.packages import get_package_share_directory
 
 class ControllerNode(Node):
     """The ROS 2 Node logic"""
@@ -66,7 +69,7 @@ class ControllerNode(Node):
 
         self.tf_buffer_ = Buffer()
         self.tf_listener_ = TransformListener(self.tf_buffer_, self)
-        pkg_share = get_package_share_directory('microspot_description')
+        pkg_share = get_package_share_directory('spotmicro_description')
         urdf_file = os.path.join(pkg_share, 'urdf', 'micro_v2.urdf')
 
         with open(urdf_file, 'r') as infp:

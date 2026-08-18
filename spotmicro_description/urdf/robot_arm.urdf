@@ -11,13 +11,13 @@
         <visual name="base_visual">
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/base.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/base.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="base_collision">
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/base.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/base.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -37,13 +37,13 @@
         <visual name="base_rotor_visual">
             <origin xyz="-9.992007221626409e-17 -0.003800001056510016 -4.809081373124969e-09" rpy="1.5707963267948974 -4.733165431326075e-30 1.2767446198576543e-15" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/base_rotor.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/base_rotor.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="base_rotor_collision">
             <origin xyz="-9.992007221626409e-17 -0.003800001056510016 -4.809081373124969e-09" rpy="1.5707963267948974 -4.733165431326075e-30 1.2767446198576543e-15" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/base_rotor.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/base_rotor.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -56,13 +56,13 @@
         <visual name="drivebig_visual">
             <origin xyz="-8.992806499463768e-16 0.03199999894348995 0.004999995190918689" rpy="-9.159339953157616e-16 -1.224646799147093e-16 -3.1415926535897687" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivebig.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivebig.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivebig_collision">
             <origin xyz="-8.992806499463768e-16 0.03199999894348995 0.004999995190918689" rpy="-9.159339953157616e-16 -1.224646799147093e-16 -3.1415926535897687" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivebig.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivebig.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -75,13 +75,13 @@
         <visual name="connector_corner_visual">
             <origin xyz="0.02379999999999961 -1.0565094843428823e-09 0.02379999846388836" rpy="-2.4589004585091578e-14 1.5707963267948832 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/connector_corner.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/connector_corner.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="connector_corner_collision">
             <origin xyz="0.02379999999999961 -1.0565094843428823e-09 0.02379999846388836" rpy="-2.4589004585091578e-14 1.5707963267948832 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/connector_corner.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/connector_corner.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -94,13 +94,13 @@
         <visual name="connector_straight_visual">
             <origin xyz="0.03999999999999957 -1.0565094399339615e-09 -1.5361121974422077e-09" rpy="-1.942890293093907e-15 1.570796326794884 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/connector_straight.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/connector_straight.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="connector_straight_collision">
             <origin xyz="0.03999999999999957 -1.0565094399339615e-09 -1.5361121974422077e-09" rpy="-1.942890293093907e-15 1.570796326794884 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/connector_straight.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/connector_straight.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -113,13 +113,13 @@
         <visual name="drivebig-1_visual">
             <origin xyz="0.03199999999999953 -1.0565092711800616e-09 -0.005000001536113139" rpy="3.14159265358978 8.383884571945006e-16 -1.5707963267948943" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivebig-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivebig-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivebig-1_collision">
             <origin xyz="0.03199999999999953 -1.0565092711800616e-09 -0.005000001536113139" rpy="3.14159265358978 8.383884571945006e-16 -1.5707963267948943" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivebig-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivebig-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -132,13 +132,13 @@
         <visual name="connector_corner-1_visual">
             <origin xyz="-1.0125233984581429e-15 -1.0565092267711408e-09 -4.809082931878095e-09" rpy="2.5590640717609827e-14 -9.077773962335396e-16 1.5707963267948988" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/connector_corner-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/connector_corner-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="connector_corner-1_collision">
             <origin xyz="-1.0125233984581429e-15 -1.0565092267711408e-09 -4.809082931878095e-09" rpy="2.5590640717609827e-14 -9.077773962335396e-16 1.5707963267948988" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/connector_corner-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/connector_corner-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -151,13 +151,13 @@
         <visual name="connector_straight-1_visual">
             <origin xyz="-4.809082829737577e-09 0.03999999894349083 1.758593271006248e-15" rpy="-1.5707963267948957 1.570796326794871 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/connector_straight-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/connector_straight-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="connector_straight-1_collision">
             <origin xyz="-4.809082829737577e-09 0.03999999894349083 1.758593271006248e-15" rpy="-1.5707963267948957 1.570796326794871 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/connector_straight-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/connector_straight-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -170,13 +170,13 @@
         <visual name="drivesmall_visual">
             <origin xyz="-1.0835776720341528e-15 0.011799998943490628 -0.007000004809082778" rpy="3.141592653589768 9.077773962418239e-16 -1.570796326794977" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivesmall_collision">
             <origin xyz="-1.0835776720341528e-15 0.011799998943490628 -0.007000004809082778" rpy="3.141592653589768 9.077773962418239e-16 -1.570796326794977" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -189,13 +189,13 @@
         <visual name="drivesmall-1_visual">
             <origin xyz="-0.011800000000003266 -1.0565057806388722e-09 0.006999995190911763" rpy="8.547016553210208e-16 -1.1052025906777729e-13 -8.022749131699552e-14" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivesmall-1_collision">
             <origin xyz="-0.011800000000003266 -1.0565057806388722e-09 0.006999995190911763" rpy="8.547016553210208e-16 -1.1052025906777729e-13 -8.022749131699552e-14" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -208,13 +208,13 @@
         <visual name="drivesmall_rotor_visual">
             <origin xyz="-3.8191672047105384e-16 1.0565052122046837e-09 -0.0037999951909112053" rpy="-3.1415926535897922 2.344905375549831e-13 8.022749131699563e-14" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivesmall_rotor_collision">
             <origin xyz="-3.8191672047105384e-16 1.0565052122046837e-09 -0.0037999951909112053" rpy="-3.1415926535897922 2.344905375549831e-13 8.022749131699563e-14" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -227,13 +227,13 @@
         <visual name="drivesmall_rotor-1_visual">
             <origin xyz="-6.683542608243443e-16 -1.0565100350135026e-09 -0.0038000015361112373" rpy="3.1415926535897922 -6.245004513516283e-16 -3.1415926535897687" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivesmall_rotor-1_collision">
             <origin xyz="-6.683542608243443e-16 -1.0565100350135026e-09 -0.0038000015361112373" rpy="3.1415926535897922 -6.245004513516283e-16 -3.1415926535897687" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-1.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor-1.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -246,13 +246,13 @@
         <visual name="drivesmall_rotor-2_visual">
             <origin xyz="-7.283063041541027e-16 -1.056509235652925e-09 0.0037999951909170092" rpy="9.355329718491719e-16 2.5895952049381713e-14 2.186969284908805e-15" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-2.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor-2.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivesmall_rotor-2_collision">
             <origin xyz="-7.283063041541027e-16 -1.056509235652925e-09 0.0037999951909170092" rpy="9.355329718491719e-16 2.5895952049381713e-14 2.186969284908805e-15" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-2.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor-2.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -265,13 +265,13 @@
         <visual name="drivesmall_rotor-3_visual">
             <origin xyz="5.506706202140776e-16 1.056509510988235e-09 0.0038000048090827267" rpy="-9.771663352796635e-16 -1.1872897055609947e-13 -3.141592653589713" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-3.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor-3.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivesmall_rotor-3_collision">
             <origin xyz="5.506706202140776e-16 1.056509510988235e-09 0.0038000048090827267" rpy="-9.771663352796635e-16 -1.1872897055609947e-13 -3.141592653589713" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-3.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor-3.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -284,13 +284,13 @@
         <visual name="drivesmall-2_visual">
             <origin xyz="0.00699999999999779 -1.0565099728410132e-09 0.011799995190917843" rpy="8.010502663708126e-14 1.5707963267947862 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall-2.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall-2.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivesmall-2_collision">
             <origin xyz="0.00699999999999779 -1.0565099728410132e-09 0.011799995190917843" rpy="8.010502663708126e-14 1.5707963267947862 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall-2.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall-2.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -303,13 +303,13 @@
         <visual name="drivesmall_rotor-4_visual">
             <origin xyz="0.0037999999999972544 1.0565073793600277e-09 4.8090855297999726e-09" rpy="-3.141592653589728 -1.5707963267947862 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-4.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor-4.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </visual>
         <collision name="drivesmall_rotor-4_collision">
             <origin xyz="0.0037999999999972544 1.0565073793600277e-09 4.8090855297999726e-09" rpy="-3.141592653589728 -1.5707963267947862 0" />
             <geometry>
-                <mesh filename="package://microspot_description/meshes/drivesmall_rotor-4.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://spotmicro_description/meshes/drivesmall_rotor-4.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>

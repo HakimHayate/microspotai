@@ -4,8 +4,8 @@ import json
 from sensor_msgs.msg import JointState
 from std_msgs.msg import String, Float64MultiArray
 
-from spotmicro_controller.gait_controller import GaitController
-from spotmicro_controller.leg_ik_solver import LegIKSolver
+from gait_controller import GaitController
+from leg_ik_solver import LegIKSolver
 
 class PiWalkerNode(Node):
     def __init__(self, len_hip=0.06, len_thigh=0.13, len_knee=0.13):
@@ -46,10 +46,8 @@ class PiWalkerNode(Node):
                 duration=data['duration'], swing_time=data['swing_time'],
                 turn_rate=data.get('turn_rate', 0.0)
             )
-
     def pc_coord_callback(self, msg):
         if self.current_mode == "pc_control":
-            # Rebuild the dictionary from the 12 incoming floats
             if self.thigh_foot_ is None:
                 self.thigh_foot_ = {}
             for i, link in enumerate(self.links_):

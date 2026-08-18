@@ -20,8 +20,6 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_desc}]
     )
 
-
-
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -30,7 +28,15 @@ def generate_launch_description():
         output='screen'
     )
 
+    controller_node = Node(
+        package='spotmicro_controller',
+        executable='controller_node',
+        name='controller_node',
+        output='screen'
+    )
+    
     return LaunchDescription([
         robot_state_publisher_node,
-        rviz_node
+        rviz_node,
+        controller_node
     ])

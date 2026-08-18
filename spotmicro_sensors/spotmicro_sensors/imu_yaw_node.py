@@ -28,9 +28,9 @@ class MyNode(Node):
         
         if self.last_time_ is not None:
             dt = current_time - self.last_time_
-            if np.abs(angular_velocity.z * dt) > 0.0001:
+            if np.abs(angular_velocity.z * dt) > 0.0005:
                 self.yaw_ += angular_velocity.z * dt
-
+        self.get_logger().info(f'yaw = {self.yaw_}')
         msg_yaw = Float64()
         msg_yaw.data = self.yaw_
         self.yaw_pub_.publish(msg_yaw)

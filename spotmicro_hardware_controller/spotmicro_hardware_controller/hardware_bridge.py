@@ -8,14 +8,21 @@ import time
 import os
 from ament_index_python.packages import get_package_share_directory
 
-class RealRobotHardwareBridge(Node):
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import JointState
+import math
+import json
+from adafruit_servokit import ServoKit
+import time
+
+class HardwareBridge(Node):
     def __init__(self):
         super().__init__('real_robot_hardware_bridge')
 
         pkg_dir = get_package_share_directory('spotmicro_hardware_controller')
         calibrate_file = os.path.join(pkg_dir, 'config', 'calibrate.json') 
-
-        micro_config_file = calibrate_file = os.path.join(pkg_dir, 'config', 'micro_config.json')  
+        micro_config_file = os.path.join(pkg_dir, 'config', 'micro_config.json') 
 
         try:
             with open(calibrate_file, 'r') as f:
@@ -82,7 +89,7 @@ class RealRobotHardwareBridge(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = RealRobotHardwareBridge()
+    node = HardwareBridge()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
@@ -93,3 +100,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+    
